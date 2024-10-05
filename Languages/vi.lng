@@ -1,0 +1,47 @@
+[Title_Program]
+Title=Công cụ cài đặt trình điều khiển máy in
+Title_pupop_about=Giới thiệu
+Title_select_driver = Chọn trình điều khiển 
+Title_install = Khởi chạy trình điều khiển
+
+[Menu_Program]
+menuFile=Tệp
+menuChangeLanguage=&Thay đổi ngôn ngữ
+menuRestartComputer=&Khởi động lại máy tính
+menuExit=Thoát
+menuHelp=Trợ giúp
+menuAbout=Giới thiệu
+menuManualSelectFile = Chọn tệp thủ công
+ActionUninstallSelect = Tệp gỡ cài đặt
+ActionInstallSelect = Tệp cài đặt
+
+[title_messagebox]
+Title_Messagebox-info=Thông báo!
+Title_Messagebox-warning=Cảnh báo!
+Title_Messagebox-error=Lỗi!
+Title_Messagebox-yesno=Xác nhận?
+
+[Text_Messagebox]
+not_install_driver=Bạn chưa cài đặt trình điều khiển Canon!
+confirm-change-language=Bạn có muốn áp dụng ngôn ngữ mới không?
+cancel_action=Người dùng hủy thao tác!
+not_close_window=Bạn không thể đóng chương trình khi tiến trình cài đặt / gỡ cài đặt trình điều khiển Canon đang được chạy!
+confirm_restart_pc=Bạn có muốn khởi động lại máy tính ngay bây giờ không?
+cannot_change_language=Bạn không thể chuyển ngôn ngữ vì thiếu tệp ngôn ngữ được yêu cầu!
+cannot_install=Không thể khởi chạy trình cài đặt vì không thể tìm thấy tệp cài đặt!
+unknown_error=Đã có lỗi xảy ra! Vui lòng kiểm tra và thử lại.
+cannotRestart = Bạn không thể khởi động máy tính trong khi cài đặt / gỡ cài đặt trình điều khiển!
+
+[Text_Dialog]
+choice_driver=Chọn trình điều khiển bạn muốn cài đặt ngôn ngữ Tiếng Việt
+SelectDriverInstall = Chọn trình điều khiển bạn muốn cài đặt dưới đây
+SelectDriverUninstall = Chọn trình điều khiển bạn muốn gỡ cài đặt dưới đây
+LoadingDriverInstall = Đang khởi chạy trình cài đặt! Vui lòng chờ...
+LoadingDriverUninstall = Đang khởi chạy trình gỡ cài đặt! Vui lòng chờ...
+InfoInstallManualSelect = 
+
+[Text_Button]
+Button_Install_text=Cài đặt trình điều khiển máy in...
+Install_Language_Vietnam=Cài đặt ngôn ngữ Tiếng Việt...
+Button_Uninstall_text=Gỡ cài đặt trình điều khiển máy in...
+ButtonBug=Báo lỗi

@@ -1,0 +1,47 @@
+[Title_Program]
+Title=Canon printer driver installation tool
+Title_pupop_about=About
+Title_select_driver = Select driver
+Title_install = Launch the driver
+
+[Menu_Program]
+menuFile=File
+menuChangeLanguage=Change Language
+menuRestartComputer=Restart Computer
+menuExit=Exit
+menuHelp=Help
+menuAbout=About
+menuManualSelectFile = Select files manually
+ActionUninstallSelect = Uninstall file
+ActionInstallSelect = Install file
+
+
+[title_messagebox]
+Title_Messagebox-info=Notification!
+Title_Messagebox-warning=Warning!
+Title_Messagebox-error=Error!
+Title_Messagebox-yesno=Confirm?
+
+[Text_Messagebox]
+not_install_driver=You have not installed the Canon driver!
+confirm-change-language=Do you want to apply the new language?
+current_language_now=You are in the current language
+cancel_action=User cancels the action!
+not_close_window=You cannot close the program while the Canon driver installation / uninstallation is running!
+confirm_restart_pc=Do you want to restart your computer now?
+cannot_change_language=You cannot switch the language because the required language file is missing!
+cannot_install=The installer could not be launched because the installation file could not be found!
+unknown_error=An error occurred! Please check and try again.
+cannotRestart = You cannot restart your computer while installing / uninstalling drivers!
+
+[Text_Dialog]
+SelectDriverInstall = Select the driver you want to install below
+SelectDriverUninstall = Select the driver you want to uninstall below
+LoadingDriverInstall = Installer is starting! Please wait...
+LoadingDriverUninstall = Uninstaller is starting! Please wait...
+InfoInstallManualSelect = 
+
+[Text_Button]
+Button_Install_text=Install printer driver...    
+Button_Uninstall_text=Uninstall printer driver...
+ButtonBug=Bug Report
