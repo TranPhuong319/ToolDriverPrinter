@@ -3,6 +3,7 @@ Title=Công cụ cài đặt trình điều khiển máy in
 Title_pupop_about=Giới thiệu
 Title_select_driver = Chọn trình điều khiển 
 Title_install = Khởi chạy trình điều khiển
+SelectManualDriver = Trình chọn trình điều khiển máy in thủ công
 
 [Menu_Program]
 menuFile=Tệp
@@ -38,7 +39,7 @@ SelectDriverInstall = Chọn trình điều khiển bạn muốn cài đặt dư
 SelectDriverUninstall = Chọn trình điều khiển bạn muốn gỡ cài đặt dưới đây
 LoadingDriverInstall = Đang khởi chạy trình cài đặt! Vui lòng chờ...
 LoadingDriverUninstall = Đang khởi chạy trình gỡ cài đặt! Vui lòng chờ...
-InfoInstallManualSelect = 
+InfoManualSelect = Vui lòng chọn trình điều khiển bằng nút [Duyệt...]
 
 [Text_Button]
 Button_Install_text=Cài đặt trình điều khiển máy in...

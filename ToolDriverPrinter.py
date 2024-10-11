@@ -34,6 +34,7 @@ process_name_to_check_install = "SetupDriver.exe"
 process_name_to_check_Uninstall = "CNABBUND.exe"
 process_name_to_check_Uninstall_2900 = "CNAB4UND.exe"
 file_ini = 'Config.ini'
+settings_file = 'settings.ini'
 restart_computer = 'shutdown -r -t 00'
 temp_path = os.getenv('TEMP')
 lock_program = os.path.join(temp_path, 'Program.LOCK')
@@ -47,6 +48,8 @@ license_en = os.path.join('License', 'LICENSE-en')
 __version__ = '1.0.2.0'
 # Đường dẫn đến thư mục hiện tại
 src_base_path = os.getcwd()
+deleteValueInstall = False
+deleteValueUninstall = False
 
 # Lấy đường dẫn đến thư mục temp
 temp_folder_path = os.getenv('TEMP')
@@ -326,6 +329,13 @@ config = configparser.ConfigParser()
 
 language, region = locale.getdefaultlocale()
 substring = language[1:5] 
+
+if os.path.exists(settings_file):
+    try:
+        global InstallPath
+        InstallPath = config.get('DriverSelectPath', 'InstallDriver')
+    except:
+        pass
 
 def detect_language():
     global current_language
@@ -1486,32 +1496,120 @@ def Install_language_vietnam_driver(event):
         print(e)
 
 class SelectManualDriverInstall(wx.Dialog):
-    def __init__(self, parent, title):
-        super(SelectManualDriverInstall, self).__init__(parent, title=title, size=(420, 160))
+    def __init__(self, parent, title, current_language):
+        super(SelectManualDriverInstall, self).__init__(parent, title=title, size=(450, 160))
 
         panel = wx.Panel(self)
+        self.current_language = current_language
 
         # Tạo text
-        text = wx.StaticText(panel, label="Chữ text", pos=(10, 10))
+        text = wx.StaticText(panel, label=language_data['Text_Dialog']['InfoManualSelect'], pos=(10, 10))
 
         # Tạo đường dẫn (ô dòng đơn - single line)
-        self.text_path = wx.TextCtrl(panel, pos=(25, 45), size=(270, 22), style=wx.TE_READONLY)
+        self.text_path = wx.TextCtrl(panel, pos=(25, 45), size=(240, 22), style=wx.TE_READONLY)
         self.text_path.SetHint("Đường dẫn")
 
+        if not os.path.exists(settings_file):
+            pass
+        else:
+            config.read(settings_file)
+            try:
+                InstallPath = config.get('Driver_Select_path', 'InstallDriver')
+                self.text_path.SetValue(InstallPath)
+            except:
+                os.remove(settings_file)
+
         # Tạo nút Browse
-        browse_button = wx.Button(panel, label="Browse..." if current_language == 'vi' else "Duyệt...", pos=(320, 30), size=(70, 25))
+        browse_button = wx.Button(panel, label="Browse..." if current_language == 'en' else "Duyệt...", pos=(275, 45), size=(70, 25))
         browse_button.Bind(wx.EVT_BUTTON, self.onBrowse)
         
-        # Tạo nút Browse
-        delete_button = wx.Button(panel, label="Delete Value" if current_language == 'en' else "Xóa giá trị", pos=(318, 60), size=(75, 25))
+        # Tạo nút Delete Value
+        delete_button = wx.Button(panel, label="Delete Value" if current_language == 'en' else "Xóa giá trị", pos=(350, 45), size=(75, 25))
         delete_button.Bind(wx.EVT_BUTTON, self.Delete_value)
 
         # Tạo nút OK
-        ok_button = wx.Button(panel, label="OK" , pos=(326, 92), size=(73, 24))
+        ok_button = wx.Button(panel, label="OK" if current_language == 'en' else 'Đồng ý' , pos=(352, 92), size=(73, 24))
         self.Bind(wx.EVT_BUTTON, self.OnOK, ok_button)
 
     def Delete_value(self, event):
-        self.text_path.SetValue()
+        self.text_path.SetValue("")
+        global deleteValueInstall
+        deleteValueInstall = True
+
+    def onBrowse(self, event):
+        try:
+            # Tạo hộp thoại chọn file .exe
+            with wx.FileDialog(self, "Chọn tệp cài đặt" if current_language == 'vi' else "Select Install file", wildcard="Executable files (*.exe)|*.exe",
+                               style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as fileDialog:
+
+                if fileDialog.ShowModal() == wx.ID_CANCEL:
+                    return  # Người dùng đã hủy, thoát ra.
+
+                # Lấy đường dẫn của file được chọn
+                pathnameInstall = fileDialog.GetPath()
+
+                # Kiểm tra nếu tệp tồn tại
+                if not os.path.exists(pathnameInstall):
+                    wx.MessageBox(f"Tệp không tồn tại: {pathnameInstall}", "Lỗi", wx.ICON_ERROR)
+                    return
+
+                # Hiển thị đường dẫn trong ô line
+                self.text_path.SetValue(pathnameInstall)
+
+                config['DriverSelectPath']={
+                    'InstallDriver': {pathnameInstall}
+                }
+        
+        except Exception as e:
+            wx.MessageBox(f"Đã xảy ra lỗi khi chọn tệp: {str(e)}", "Lỗi", wx.ICON_ERROR)
+
+    def OnOK(self, event):
+        try:
+            if deleteValueInstall:
+                with open(settings_file, 'w', encoding='utf-8') as file:
+                    config.write(file)
+            else:
+                pass
+            self.Close()
+            InstallPath = config.get('DriverSelectPath', 'InstallDriver')
+        except Exception as e:
+            wx.MessageBox(f"Đã xảy ra lỗi: {str(e)}", "Lỗi", wx.ICON_ERROR)
+
+class SelectManualDriverUninstall(wx.Dialog):
+    def __init__(self, parent, title, current_language):
+        super(SelectManualDriverUninstall, self).__init__(parent, title=title, size=(450, 160))
+
+        panel = wx.Panel(self)
+        self.current_language = current_language
+
+        # Tạo text
+        text = wx.StaticText(panel, label=language_data['Text_Dialog']['InfoManualSelect'], pos=(10, 10))
+
+        # Tạo đường dẫn (ô dòng đơn - single line)
+        self.text_path = wx.TextCtrl(panel, pos=(25, 45), size=(240, 22), style=wx.TE_READONLY)
+        self.text_path.SetHint("Đường dẫn")
+
+        if not os.path.exists(settings_file):
+            pass
+        else:
+            config.read(settings_file)
+            UninstallPath = config.get('Driver_Select_path', 'UninstallDriver')
+            self.text_path.SetValue(UninstallPath)
+
+        # Tạo nút Browse
+        browse_button = wx.Button(panel, label="Browse..." if current_language == 'en' else "Duyệt...", pos=(275, 45), size=(70, 25))
+        browse_button.Bind(wx.EVT_BUTTON, self.onBrowse)
+        
+        # Tạo nút Delete Value
+        delete_button = wx.Button(panel, label="Delete Value" if current_language == 'en' else "Xóa giá trị", pos=(350, 45), size=(75, 25))
+        delete_button.Bind(wx.EVT_BUTTON, self.Delete_value)
+
+        # Tạo nút OK
+        ok_button = wx.Button(panel, label="OK" if current_language == 'en' else 'Đồng ý' , pos=(352, 92), size=(73, 24))
+        self.Bind(wx.EVT_BUTTON, self.OnOK, ok_button)
+
+    def Delete_value(self, event):
+        self.text_path.SetValue("")
 
     def onBrowse(self, event):
         try:
@@ -1532,68 +1630,26 @@ class SelectManualDriverInstall(wx.Dialog):
 
                 # Hiển thị đường dẫn trong ô line
                 self.text_path.SetValue(pathname)
+
+                config['Driver_Select_path']={
+                    'UninstallDriver': {pathname}
+                }
         
         except Exception as e:
             wx.MessageBox(f"Đã xảy ra lỗi khi chọn tệp: {str(e)}", "Lỗi", wx.ICON_ERROR)
 
     def OnOK(self, event):
         try:
-            self.Close()
-        except Exception as e:
-            wx.MessageBox(f"Đã xảy ra lỗi: {str(e)}", "Lỗi", wx.ICON_ERROR)
-
-class SelectManualDriverUninstall(wx.Dialog):
-    def __init__(self, parent, title):
-        super(SelectManualDriverInstall, self).__init__(parent, title=title, size=(420, 160))
-
-        panel = wx.Panel(self)
-
-        # Tạo text
-        text = wx.StaticText(panel, label="Chữ text", pos=(10, 10))
-
-        # Tạo đường dẫn (ô dòng đơn - single line)
-        self.text_path = wx.TextCtrl(panel, pos=(25, 45), size=(270, 22), style=wx.TE_READONLY)
-        self.text_path.SetHint("Đường dẫn")
-
-        # Tạo nút Browse
-        browse_button = wx.Button(panel, label="Nút Browse", pos=(320, 45), size=(70, 25))
-        browse_button.Bind(wx.EVT_BUTTON, self.onBrowse)
-
-        # Tạo nút OK
-        ok_button = wx.Button(panel, label="OK" , pos=(326, 92), size=(73, 24))
-        self.Bind(wx.EVT_BUTTON, self.OnOK, ok_button)
-
-    def onBrowse(self, event):
-        try:
-            # Tạo hộp thoại chọn file .exe
-            with wx.FileDialog(self, "Chọn file EXE", wildcard="Executable files (*.exe)|*.exe",
-                               style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as fileDialog:
-
-                if fileDialog.ShowModal() == wx.ID_CANCEL:
-                    return  # Người dùng đã hủy, thoát ra.
-
-                # Lấy đường dẫn của file được chọn
-                pathname = fileDialog.GetPath()
-
-                # Kiểm tra nếu tệp tồn tại
-                if not os.path.exists(pathname):
-                    wx.MessageBox(f"Tệp không tồn tại: {pathname}", "Lỗi", wx.ICON_ERROR)
-                    return
-
-                # Hiển thị đường dẫn trong ô line
-                self.text_path.SetValue(pathname)
-        
-        except Exception as e:
-            wx.MessageBox(f"Đã xảy ra lỗi khi chọn tệp: {str(e)}", "Lỗi", wx.ICON_ERROR)
-
-    def OnOK(self, event):
-        try:
+            with open(settings_file, 'w', encoding='utf-8') as file:
+                file.write(config)
             self.Close()
         except Exception as e:
             wx.MessageBox(f"Đã xảy ra lỗi: {str(e)}", "Lỗi", wx.ICON_ERROR)
 
 def DialogSelectManualInstall(event):
-    dialog=SelectManualDriverInstall(None, title="n")
+    config.read(file_ini)
+    current_language = config.get('Language', 'current_language')
+    dialog=SelectManualDriverInstall(None, title=language_data['Title_Program']['SelectManualDriver'], current_language=current_language)
     dialog.ShowModal()
     dialog.Destroy()
 def DialogSelectManualUninstall(event):

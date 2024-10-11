@@ -3,6 +3,7 @@ Title=Canon printer driver installation tool
 Title_pupop_about=About
 Title_select_driver = Select driver
 Title_install = Launch the driver
+SelectManualDriver = Manual printer driver selector
 
 [Menu_Program]
 menuFile=File
@@ -39,7 +40,7 @@ SelectDriverInstall = Select the driver you want to install below
 SelectDriverUninstall = Select the driver you want to uninstall below
 LoadingDriverInstall = Installer is starting! Please wait...
 LoadingDriverUninstall = Uninstaller is starting! Please wait...
-InfoInstallManualSelect = 
+InfoManualSelect = Please select the driver using the [Browse...] button.
 
 [Text_Button]
 Button_Install_text=Install printer driver...    
