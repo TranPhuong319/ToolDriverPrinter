@@ -3,5 +3,6 @@ Ver 1.0.2:
     - Fix bugs và tối ưu tính năng
     - Thêm bảng điều khoản sử dụng
     - Thay đổi cấu trúc phát hiện 2 ứng dụng chạy cùng
-    - Tối ưu hiển thị Tệp License
-    - Có thể chọn Trình cài đặt, gỡ cài đặt thủ công (Sẽ ra mắt)
+    - Tối ưu hiển thị Tệp License ở mục About
+    - Có thể chọn Trình cài đặt, gỡ cài đặt thủ công 
+    - Thay đổi cấu trúc lưu cài đặt.
