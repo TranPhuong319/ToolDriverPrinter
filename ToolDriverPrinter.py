@@ -136,119 +136,32 @@ def Check_Files():
             MissingFile.MainLoop()
             sys.exit()
 
-for dir_path in onefile_dirs:
-    # Lấy thời gian tạo thư mục
-    creation_time = os.path.getctime(dir_path)
-
-    # Kiểm tra nếu thời gian tạo gần với thời gian hiện tại (có thể điều chỉnh khoảng cách)
-    if creation_time > latest_creation_time and (current_time - creation_time) <= 24 * 60 * 60:  # 24 giờ
-        latest_onefile_dir = dir_path
-        latest_creation_time = creation_time
-# Nếu tìm thấy thư mục mới nhất, sử dụng nó để tạo đường dẫn tệp
-if not latest_onefile_dir == None:
-        base_dir = latest_onefile_dir
-        file_icon = os.path.join(base_dir, 'Icon', 'IconProgram.ico')
-        file_en = os.path.join(base_dir, 'Languages', 'en.lng')
-        file_vi = os.path.join(base_dir, 'Languages', 'vi.lng')
-        file_setup_driver_vi_6300 = os.path.join(base_dir, 'LBP6300dn_R150_V110_W64_vi_VN_1', 'SetupDriver.exe')
-        file_Uninstall_driver_vi_6300 = os.path.join(base_dir, 'LBP6300dn_R150_V110_W64_vi_VN_1', 'MISC', 'CNABBUND.exe')
-        file_setup_driver_en_6300 = os.path.join(base_dir, 'LBP6300dn_R150_V110_W64_uk_EN_1', 'SetupDriver.exe')
-        file_Uninstall_driver_en_6300 = os.path.join(base_dir, 'LBP6300dn_R150_V110_W64_uk_EN_1', 'MISC', 'CNABBUND.exe')
-        file_setup_driver_vi_2900 = os.path.join(base_dir, 'LBP2900_R150_V330_W64_vi_VN_2', 'x64', 'SetupDriver.exe')
-        file_Uninstall_driver_vi_2900 = os.path.join(base_dir, 'LBP2900_R150_V330_W64_vi_VN_2', 'x64', 'MISC', 'CNAB4UND.exe')
-        file_setup_driver_en_2900 = os.path.join(base_dir, 'LBP2900_R150_V330_W64_uk_EN_2', 'x64', 'SetupDriver.exe')
-        file_Uninstall_driver_en_2900 = os.path.join(base_dir, 'LBP2900_R150_V330_W64_uk_EN_2', 'x64', 'MISC', 'CNAB4UND.exe')
-        icon_install = os.path.join(base_dir, 'Icon', 'install.png')
-        icon_change_language = os.path.join(base_dir, 'Icon', 'change_language.png')
-        icon_exit = os.path.join(base_dir, 'Icon', 'exit.png')
-        icon_terminal = os.path.join(base_dir, 'Icon', 'terminal.png')
-        icon_info = os.path.join(base_dir, 'Icon', 'info.png')
-        icon_uninstall = os.path.join(base_dir, 'Icon', 'uninstall.png')
-        icon_vi = os.path.join(base_dir, 'Icon', 'vi.png')
-        icon_us = os.path.join(base_dir, 'Icon', 'us.png')
-        icon_restart = os.path.join(base_dir, 'Icon', 'restart.png')
-        license_vi = os.path.join(base_dir, 'License', 'LICENSE-vi')
-        license_en = os.path.join(base_dir, 'License', 'LICENSE-en')
-        Check_Files()
-else:
-        class MissingFileError(wx.Dialog):
-            def __init__(self, parent, message, timeout=7):
-                super(MissingFileError, self).__init__(parent, title=f"Closing in {timeout} seconds", size=(410, 250))
-                
-                self.timeout = timeout
-                self.remaining_time = timeout
-                
-                # Thiết lập giao diện
-                panel = wx.Panel(self)
-                vbox = wx.BoxSizer(wx.VERTICAL)
-
-                # Thêm một sizer để chứa biểu tượng và tin nhắn
-                hbox = wx.BoxSizer(wx.HORIZONTAL)
-
-                # Thêm biểu tượng lỗi
-                icon = wx.ArtProvider.GetBitmap(wx.ART_ERROR, wx.ART_FRAME_ICON, (32, 32))
-                icon_bitmap = wx.StaticBitmap(panel, bitmap=icon)
-                hbox.Add(icon_bitmap, flag=wx.ALIGN_TOP | wx.RIGHT, border=10)
-
-                # Tin nhắn
-                message_label = wx.StaticText(panel, label=message, style=wx.ST_NO_AUTORESIZE)
-                hbox.Add(message_label, proportion=1, flag=wx.EXPAND)
-
-                vbox.Add(hbox, proportion=1, flag=wx.EXPAND | wx.ALL, border=20)
-                
-                # Nút OK có khoảng cách 5px với viền hộp thoại
-                ok_button = wx.Button(panel, label='OK')
-                ok_button.Bind(wx.EVT_BUTTON, self.on_close)
-                vbox.Add(ok_button, flag=wx.ALIGN_RIGHT | wx.ALL, border=10)
-                
-                panel.SetSizer(vbox)
-                
-                # Thiết lập Timer
-                self.timer = wx.Timer(self)
-                self.Bind(wx.EVT_TIMER, self.on_timer, self.timer)
-
-            def ShowModal(self):
-                # Start playing the sound in a separate thread
-                sound_thread = threading.Thread(target=self.play_sound)
-                sound_thread.start()
-                self.timer.Start(1000)  # Mỗi giây cập nhật 1 lần
-                result = super(MissingFileError, self).ShowModal()
-                return result
-
-            def play_sound(self):
-                winsound.PlaySound("SystemHand", winsound.SND_ALIAS)
-            def on_timer(self, event):
-                self.remaining_time -= 1
-                if self.remaining_time > -1:
-                    self.SetTitle(f"Closing in {self.remaining_time} seconds")
-                else:
-                    self.timer.Stop()
-                    self.Close()
-
-            def on_close(self, event):
-                self.timer.Stop()
-                self.Close()
-                sys.exit()
-
-        # Tạo ứng dụng wxPython
-        MissingFile = wx.App(False)
-
-        # Tạo hộp thoại tự động đóng
-        message = (f"An error occurred that prevented the program from starting...\n"
-                   f"Please close the program and reopen it.\n\n"
-                    f"Đã xảy ra lỗi khiến chương trình không thể khởi chạy...\n"
-                    f"Vui lòng tắt chương trình rồi mở lại.")
-
-        # Hiển thị hộp thoại tự động đóng với tiêu đề cập nhật thời gian và biểu tượng lỗi
-        dlg = MissingFileError(None, message=f"{message}")
-        # Show the dialog and start the timer
-        dlg.ShowModal()
-
-        # Kết thúc ứng dụng
-        dlg.Destroy()
-        MissingFile.MainLoop()
-        sys.exit()
-
+# Khai báo các biến, library
+file_icon = os.path.join('Icon', 'IconProgram.ico')
+file_en = os.path.join('Languages', 'en.lng')
+file_vi = os.path.join('Languages', 'vi.lng')
+file_setup_driver_vi_6300 = os.path.join('LBP6300dn_R150_V110_W64_vi_VN_1', 'SetupDriver.exe')
+file_Uninstall_driver_vi_6300 = os.path.join('LBP6300dn_R150_V110_W64_vi_VN_1', 'MISC', 'CNABBUND.exe')
+file_setup_driver_en_6300 = os.path.join('LBP6300dn_R150_V110_W64_uk_EN_1', 'SetupDriver.exe')
+file_Uninstall_driver_en_6300 = os.path.join('LBP6300dn_R150_V110_W64_uk_EN_1', 'MISC', 'CNABBUND.exe')
+file_setup_driver_vi_2900 = os.path.join('LBP2900_R150_V330_W64_vi_VN_2', 'x64', 'SetupDriver.exe')
+file_Uninstall_driver_vi_2900 = os.path.join('LBP2900_R150_V330_W64_vi_VN_2', 'x64', 'MISC', 'CNAB4UND.exe')
+file_setup_driver_en_2900 = os.path.join('LBP2900_R150_V330_W64_uk_EN_2', 'x64', 'SetupDriver.exe')
+file_Uninstall_driver_en_2900 = os.path.join('LBP2900_R150_V330_W64_uk_EN_2', 'x64', 'MISC', 'CNAB4UND.exe')
+icon_install = os.path.join('Icon', 'install.png')
+icon_change_language = os.path.join('Icon', 'change_language.png')
+icon_exit = os.path.join('Icon', 'exit.png')
+icon_terminal = os.path.join('Icon', 'terminal.png')
+icon_info = os.path.join('Icon', 'info.png')
+icon_uninstall = os.path.join('Icon', 'uninstall.png')
+icon_vi = os.path.join('Icon', 'vi.png')
+icon_us = os.path.join('Icon', 'us.png')
+icon_restart = os.path.join('Icon', 'restart.png')
+license_vi = os.path.join('License', 'LICENSE-vi')
+license_en = os.path.join('License', 'LICENSE-en')
+print(file_en)
+print(file_vi)
+print(latest_onefile_dir)
 # Định nghĩa các biến tập tin
 process_name_to_check_install = "SetupDriver.exe"
 process_name_to_check_Uninstall = "CNABBUND.exe"
@@ -267,6 +180,7 @@ __version__ = '1.0.2.0'
 src_base_path = os.getcwd()
 deleteValueInstall = False
 deleteValueUninstall = False
+Check_Files()
 
 # Lấy đường dẫn đến thư mục temp
 temp_folder_path = os.getenv('TEMP')
@@ -1024,7 +938,7 @@ def is_process_running(process_name):
 def load_language(current_language):
     Check_Files()
     global language_data, panel
-    file_path = os.path.join(base_dir, 'Languages',  f'{current_language}.lng')
+    file_path = os.path.join('Languages',  f'{current_language}.lng')
     if os.path.exists(file_path):
         confirm_Change_Language = wx.MessageBox(
         language_data['Text_Messagebox']['confirm-change-language'],
@@ -1047,7 +961,7 @@ def load_language(current_language):
             panel = wx.Panel(frame)
             vbox = wx.BoxSizer(wx.VERTICAL)
 
-            frame.SetSize((250, 210) if current_language == 'vi' else (250, 170))
+            frame.SetSize((250, 200) if current_language == "vi" else (230, 165))
             frame_title = language_data['Title_Program']['Title']  # Đặt title từ file lng
             frame.SetTitle(frame_title)
             
@@ -1420,197 +1334,125 @@ def Install_language_vietnam_driver(event):
         )
         print(e)
 
-# class SelectManualDriverInstall(wx.Dialog):
-#     def __init__(self, parent, title, current_language):
-#         super(SelectManualDriverInstall, self).__init__(parent, title=title, size=(450, 160))
+import wx
+import os
+import json
 
-#         panel = wx.Panel(self)
-#         self.current_language = current_language
+class SelectManualDriverInstall(wx.Dialog):
+    def __init__(self, parent, title, current_language):
+        super(SelectManualDriverInstall, self).__init__(parent, title=title, size=(450, 160))
 
-#         # Tạo text
-#         text = wx.StaticText(panel, label=language_data['Text_Dialog']['InfoManualSelect'], pos=(10, 10))
+        panel = wx.Panel(self)
+        self.current_language = current_language
 
-#         # Tạo đường dẫn (ô dòng đơn - single line)
-#         self.text_path = wx.TextCtrl(panel, pos=(25, 45), size=(240, 22), style=wx.TE_READONLY)
-#         self.text_path.SetHint("Đường dẫn" if current_language == 'vi' else "Path")
+        # Tạo text
+        text = wx.StaticText(panel, label=language_data['Text_Dialog']['InfoManualSelect'], pos=(10, 10))
 
-#         if not os.path.exists(settings_file):
-#             pass
-#         else:
-#             config.read(settings_file)
-#             try:
-#                 InstallPath = SelectDriver.get('DriverSelectPath', 'InstallDriver')
-#                 self.text_path.SetValue(InstallPath)
-#             except Exception as e:
-#                 print(e)
-#                 os.remove(settings_file)
+        # Tạo đường dẫn (ô dòng đơn - single line)
+        self.text_path = wx.TextCtrl(panel, pos=(25, 45), size=(240, 22), style=wx.TE_READONLY)
+        self.text_path.SetHint("Đường dẫn" if current_language == 'vi' else "Path")
 
-#         # Tạo nút Browse
-#         browse_button = wx.Button(panel, label="Browse..." if current_language == 'en' else "Duyệt...", pos=(275, 45), size=(70, 25))
-#         browse_button.Bind(wx.EVT_BUTTON, self.onBrowse)
+        # Check if the JSON file exists and load the saved path if it does
+        if os.path.exists(path_driver_select):
+            try:
+                with open(path_driver_select, 'r', encoding='utf-8') as json_file:
+                    data = json.load(json_file)
+                    InstallPath = data.get('DriverSelectPath', {}).get('InstallDriver', "")
+                    self.text_path.SetValue(InstallPath)
+            except Exception as e:
+                print(e)
+                os.remove(path_driver_select)  # Remove file if there's an error reading it
+
+        # Tạo nút Browse
+        browse_button = wx.Button(panel, label="Browse..." if current_language == 'en' else "Duyệt...", pos=(275, 45), size=(70, 25))
+        browse_button.Bind(wx.EVT_BUTTON, self.onBrowse)
         
-#         # Tạo nút Delete Value
-#         delete_button = wx.Button(panel, label="Delete Value" if current_language == 'en' else "Xóa giá trị", pos=(350, 45), size=(75, 25))
-#         delete_button.Bind(wx.EVT_BUTTON, self.Delete_value)
+        # Tạo nút Delete Value
+        delete_button = wx.Button(panel, label="Delete Value" if current_language == 'en' else "Xóa giá trị", pos=(350, 45), size=(75, 25))
+        delete_button.Bind(wx.EVT_BUTTON, self.Delete_value)
 
-#         # Tạo nút OK
-#         ok_button = wx.Button(panel, label="OK" if current_language == 'en' else 'Đồng ý' , pos=(352, 92), size=(73, 24))
-#         self.Bind(wx.EVT_BUTTON, self.OnOK, ok_button)
-#         print(current_language)
+        # Tạo nút OK
+        ok_button = wx.Button(panel, label="OK" if current_language == 'en' else 'Đồng ý' , pos=(352, 92), size=(73, 24))
+        self.Bind(wx.EVT_BUTTON, self.OnOK, ok_button)
+        print(current_language)
 
-#     def Delete_value(self, event):
-#         self.text_path.SetValue("")
+    def Delete_value(self, event):
+        self.text_path.SetValue("")
 
+    def onBrowse(self, event):
+        current_language = read_language_from_json(file_ini_language)
+        try:
+            # Tạo hộp thoại chọn file .exe
+            with wx.FileDialog(self, "Chọn tệp cài đặt" if current_language == 'vi' else "Select Install file", wildcard="Executable files (*.exe)|*.exe",
+                               style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as fileDialog:
 
-#     def onBrowse(self, event):
-#         current_language = read_language_from_json(file_ini_language)
-#         try:
-#             # Tạo hộp thoại chọn file .exe
-#             with wx.FileDialog(self, "Chọn tệp cài đặt" if current_language == 'vi' else "Select Install file", wildcard="Executable files (*.exe)|*.exe"  if current_language == 'en' else "Chương trình thực thi (*.exe) | *.exe",
-#                                style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as fileDialog:
+                if fileDialog.ShowModal() == wx.ID_CANCEL:
+                    return  # Người dùng đã hủy, thoát ra.
 
-#                 if fileDialog.ShowModal() == wx.ID_CANCEL:
-#                     return  # Người dùng đã hủy, thoát ra.
+                # Lấy đường dẫn của file được chọn
+                pathnameInstall = fileDialog.GetPath()
 
-#                 # Lấy đường dẫn của file được chọn
-#                 pathnameInstall = fileDialog.GetPath()
+                # Kiểm tra nếu tệp tồn tại
+                if not os.path.exists(pathnameInstall):
+                    wx.MessageBox(f"Tệp không tồn tại: {pathnameInstall}", "Lỗi", wx.ICON_ERROR)
+                    return
 
-#                 # Kiểm tra nếu tệp tồn tại
-#                 if not os.path.exists(pathnameInstall):
-#                     wx.MessageBox(f"Tệp không tồn tại: {pathnameInstall}", "Lỗi", wx.ICON_ERROR)
-#                     return
+                # Hiển thị đường dẫn trong ô line
+                self.text_path.SetValue(pathnameInstall)
+                print(pathnameInstall)
 
-#                 # Hiển thị đường dẫn trong ô line
-#                 self.text_path.SetValue(pathnameInstall)
-#                 print(pathnameInstall)
-#                 SelectDriver['DriverSelectPath'] = {
-#                         'InstallDriver': pathnameInstall
-#                     }
-#         except Exception as e:
-#             wx.MessageBox(f"Đã xảy ra lỗi khi chọn tệp: {str(e)}", "Lỗi", wx.ICON_ERROR)
+                # Cập nhật đường dẫn vào dictionary
+                SelectDriver = {
+                    'DriverSelectPath': {
+                        'InstallDriver': pathnameInstall
+                    }
+                }
+        except Exception as e:
+            wx.MessageBox(f"Đã xảy ra lỗi khi chọn tệp: {str(e)}", "Lỗi", wx.ICON_ERROR)
 
-#     def OnOK(self, event):
-#         try:
-#             # Lấy đường dẫn từ ô text
-#             pathnameInstall = self.text_path.GetValue()
+    def OnOK(self, event):
+        try:
+            # Lấy đường dẫn từ ô text
+            pathnameInstall = self.text_path.GetValue()
 
-#             # Nếu đường dẫn trống thì lưu giá trị là ""
-#             if not pathnameInstall:
-#                 SelectDriver['DriverSelectPath'] = {
-#                     'InstallDriver': ""
-#                 }
-#                 with open(settings_file, 'w', encoding='utf-8') as file:
-#                     SelectDriver.write(file)
-#                 global deleteValueInstall
-#                 deleteValueInstall = False
-#                 if current_language == 'vi':
-#                     install_lang_button.Enable() # Dừng ở sửa đồng bộ disable nút 
-#                 self.Close()
-#                 return
+            # Cập nhật đường dẫn vào file JSON
+            if pathnameInstall or pathnameInstall == "":
+                SelectDriver = {
+                    'DriverSelectPath': {
+                        'InstallDriver': pathnameInstall
+                    }
+                }
 
-#             # Nếu đường dẫn không trống thì tiến hành xử lý
-#             if os.path.exists(pathnameInstall):
-#                 # Cập nhật đường dẫn vào file INI
-#                 SelectDriver['DriverSelectPath'] = {
-#                     'InstallDriver': pathnameInstall
-#                 }
+                # Ghi lại file JSON sau khi cập nhật
+                with open(path_driver_select, 'w', encoding='utf-8') as json_file:
+                    json.dump(SelectDriver, json_file, ensure_ascii=False, indent=4)
 
-#                 # Ghi lại file INI sau khi cập nhật
-#                 with open(settings_file, 'w', encoding='utf-8') as file:
-#                     SelectDriver.write(file)
-#                 if not pathnameInstall == "":
-#                 # Khóa nút install_lang_button nếu có đường dẫn hợp lệ
-#                     if current_language == 'vi':
-#                         install_lang_button.Disable()
-#                     deleteValueInstall = True
-#                 wx.MessageBox(f"Đã lưu đường dẫn: {pathnameInstall}", "Thông báo", wx.ICON_INFORMATION)
-#             else:
-#                 wx.MessageBox(f"Tệp không tồn tại: {pathnameInstall}", "Lỗi", wx.ICON_ERROR)
+                # Khóa nút install_lang_button nếu có đường dẫn hợp lệ
+                if not pathnameInstall == "" and os.path.exists(pathnameInstall) and current_language == 'vi':
+                    install_lang_button.Disable()
+                else:
+                    try:
+                        install_lang_button.Enable()
+                    except Exception as e:
+                        print(e)
+                deleteValueInstall = bool(pathnameInstall)
+                if not pathnameInstall == "":
+                    wx.MessageBox(f"Đã lưu đường dẫn: {pathnameInstall}" if current_language == 'vi' else f"Saved path: {pathnameInstall}", "Thông báo" if current_language == "vi" else "Infomation", wx.ICON_INFORMATION)
+                else:
+                    wx.MessageBox(f"Đã xóa đường dẫn." if current_language == 'vi' else "Deleted Directory", "Thông báo" if current_language == "vi" else "Infomation", wx.ICON_INFORMATION)
+            else:
+                wx.MessageBox("Đường dẫn không tồn tại hoặc trống." if current_language == "vi" else "Path does not exist or is empty.", "Lỗi" if current_language == 'vi' else 'Error', wx.ICON_ERROR)
 
-#             self.Close()
+            self.Close()
 
-#         except Exception as e:
-#             print(e)
-#             wx.MessageBox(f"Đã xảy ra lỗi: {str(e)}", "Lỗi", wx.ICON_ERROR)
-
-
-# class SelectManualDriverUninstall(wx.Dialog):
-#     def __init__(self, parent, title, current_language):
-#         super(SelectManualDriverUninstall, self).__init__(parent, title=title, size=(450, 160))
-
-#         panel = wx.Panel(self)
-#         self.current_language = current_language
-
-#         # Tạo text
-#         text = wx.StaticText(panel, label=language_data['Text_Dialog']['InfoManualSelect'], pos=(10, 10))
-
-#         # Tạo đường dẫn (ô dòng đơn - single line)
-#         self.text_path = wx.TextCtrl(panel, pos=(25, 45), size=(240, 22), style=wx.TE_READONLY)
-#         self.text_path.SetHint("Đường dẫn")
-
-#         if not os.path.exists(settings_file):
-#             pass
-#         else:
-#             config.read(settings_file)
-#             UninstallPath = config.get('Driver_Select_path', 'UninstallDriver')
-#             self.text_path.SetValue(UninstallPath)
-
-#         # Tạo nút Browse
-#         browse_button = wx.Button(panel, label="Browse..." if current_language == 'en' else "Duyệt...", pos=(275, 45), size=(70, 25))
-#         browse_button.Bind(wx.EVT_BUTTON, self.onBrowse)
-        
-#         # Tạo nút Delete Value
-#         delete_button = wx.Button(panel, label="Delete Value" if current_language == 'en' else "Xóa giá trị", pos=(350, 45), size=(75, 25))
-#         delete_button.Bind(wx.EVT_BUTTON, self.Delete_value)
-
-#         # Tạo nút OK
-#         ok_button = wx.Button(panel, label="OK" if current_language == 'en' else 'Đồng ý' , pos=(352, 92), size=(73, 24))
-#         self.Bind(wx.EVT_BUTTON, self.OnOK, ok_button)
-
-#     def Delete_value(self, event):
-#         self.text_path.SetValue("")
-
-#     def onBrowse(self, event):
-#         try:
-#             # Tạo hộp thoại chọn file .exe
-#             with wx.FileDialog(self, "Chọn tệp cài đặt" if current_language == 'vi' else "Select Install file", wildcard="Executable files (*.exe)|*.exe",
-#                                style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as fileDialog:
-
-#                 if fileDialog.ShowModal() == wx.ID_CANCEL:
-#                     return  # Người dùng đã hủy, thoát ra.
-
-#                 # Lấy đường dẫn của file được chọn
-#                 pathname = fileDialog.GetPath()
-
-#                 # Kiểm tra nếu tệp tồn tại
-#                 if not os.path.exists(pathname):
-#                     wx.MessageBox(f"Tệp không tồn tại: {pathname}", "Lỗi", wx.ICON_ERROR)
-#                     return
-
-#                 # Hiển thị đường dẫn trong ô line
-#                 self.text_path.SetValue(pathname)
-
-#                 config['Driver_Select_path']={
-#                     'UninstallDriver': {pathname}
-#                 }
-        
-#         except Exception as e:
-#             wx.MessageBox(f"Đã xảy ra lỗi khi chọn tệp: {str(e)}", "Lỗi", wx.ICON_ERROR)
-
-#     def OnOK(self, event):
-#         try:
-#             with open(settings_file, 'w', encoding='utf-8') as file:
-#                 file.write(config)
-#             self.Close()
-#         except Exception as e:
-#             wx.MessageBox(f"Đã xảy ra lỗi: {str(e)}", "Lỗi", wx.ICON_ERROR)
+        except Exception as e:
+            print(e)
 
 def DialogSelectManualInstall(event):
-    # current_language = read_language_from_json(file_ini_language)
-    # dialog=SelectManualDriverInstall(None, title=language_data['Title_Program']['SelectManualDriver'], current_language=current_language)
-    # dialog.ShowModal()
-    # dialog.Destroy()
-    pass
+    current_language = read_language_from_json(file_ini_language)
+    dialog=SelectManualDriverInstall(None, title=language_data['Title_Program']['SelectManualDriver'], current_language=current_language)
+    dialog.ShowModal()
+    dialog.Destroy()
 
 def DialogSelectManualUninstall(event):
     print(2)
@@ -1836,7 +1678,7 @@ class window(wx.App):
         global frame
         global current_language
         # Xác định kích thước cửa sổ dựa trên ngôn ngữ
-        window_size = (250, 210) if current_language == "vi" else (250, 170)
+        window_size = (250, 200) if current_language == "vi" else (230, 165)
 
         # Tạo cửa sổ chính với kích thước đã xác định
         frame = wx.Frame(None, 
@@ -1844,7 +1686,6 @@ class window(wx.App):
                  style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX),
                  size=window_size)
         frame.Bind(wx.EVT_CLOSE, on_closing)
-
 
         if os.path.exists(file_icon):
             frame.SetIcon(wx.Icon(file_icon))
