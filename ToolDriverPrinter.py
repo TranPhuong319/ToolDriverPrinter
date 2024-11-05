@@ -159,9 +159,6 @@ icon_us = os.path.join('Icon', 'us.png')
 icon_restart = os.path.join('Icon', 'restart.png')
 license_vi = os.path.join('License', 'LICENSE-vi')
 license_en = os.path.join('License', 'LICENSE-en')
-print(file_en)
-print(file_vi)
-print(latest_onefile_dir)
 # Định nghĩa các biến tập tin
 process_name_to_check_install = "SetupDriver.exe"
 process_name_to_check_Uninstall = "CNABBUND.exe"
