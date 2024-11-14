@@ -1408,6 +1408,7 @@ class SelectManualDriverInstall(wx.Dialog):
             wx.MessageBox(f"Đã xảy ra lỗi khi chọn tệp: {str(e)}", "Lỗi", wx.ICON_ERROR)
 
     def OnOK(self, event):
+        current_language = read_language_from_json(file_ini_language)
         try:
             # Lấy đường dẫn từ ô text
             pathnameInstall = self.text_path.GetValue()
@@ -1429,7 +1430,8 @@ class SelectManualDriverInstall(wx.Dialog):
                     install_lang_button.Disable()
                 else:
                     try:
-                        install_lang_button.Enable()
+                        if current_language == "vi":
+                            install_lang_button.Enable()
                     except Exception as e:
                         print(e)
                 deleteValueInstall = bool(pathnameInstall)
