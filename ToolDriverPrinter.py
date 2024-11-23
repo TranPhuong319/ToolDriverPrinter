@@ -4,7 +4,7 @@
 # Version 1.0.2
 # Compile by Nuitka
 import json ; import os ; import subprocess ; import sys ; import wx.adv; import glob; import tempfile; from datetime import datetime; import re ; import webbrowser ; import configparser
-import wx ; import msvcrt ; import locale ; import psutil; import shutil; import threading; import time; import winsound; from plyer import notification; import fnmatch # Nhập thư viện cần thiết
+import wx ; import msvcrt ; import locale ; import psutil; import threading; import time; import winsound; from plyer import notification; import fnmatch # Nhập thư viện cần thiết
 
 # Thay đổi thư mục làm việc thành thư mục chứa tệp chạy
 os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
@@ -1728,3 +1728,4 @@ with open(f'Languages\{current_language}.lng', 'r', encoding='utf-8') as file:
 
 TDP = window()
 TDP.MainLoop()
+
