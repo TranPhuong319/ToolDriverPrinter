@@ -94,7 +94,7 @@ Nếu bạn gặp lỗi, đóng góp tính năng, vui lòng mở mục issue tr�
 
 ## Giấy Phép
 
-Dự án này được cấp phép theo [Apache-2.0 license](License\LICENSE-vi).
+Dự án này được cấp phép theo [Apache-2.0 license](License/LICENSE-vi).
 
 ## Ghi chú
 
@@ -193,7 +193,7 @@ If you encounter any bugs or contribute any features, please open an issue on Gi
 
 ## License
 
-This project is licensed under the [Apache-2.0 license](License\LICENSE-en).
+This project is licensed under the [Apache-2.0 license](License/LICENSE-en).
 
 ## Notes
 
