@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-# Printer driver installation tool
-# Copyright ©️ 2023-2024 TranPhuong319
-# Version 1.0.2
-# Compile by Nuitka
+"""
+ Printer driver installation tool
+ Copyright ©️ 2023-2024 TranPhuong319
+ Version 1.0.2
+ Compile by Nuitka
+ More infomation, visit https://github.com/TranPhuong319/ToolDriverPrinter */ 
+"""
 import json ; import os ; import subprocess ; import sys ; import wx.adv; import glob; import tempfile; from datetime import datetime; import re ; import webbrowser ; import configparser
-import wx ; import msvcrt ; import locale ; import psutil; import threading; import time; import winsound; from plyer import notification; import fnmatch # Nhập thư viện cần thiết
+import wx ; import msvcrt ; import locale ; import psutil; import threading; import time; import winsound; from plyer import notification; import fnmatch ; import winreg # Nhập thư viện cần thiết
 
 # Thay đổi thư mục làm việc thành thư mục chứa tệp chạy
 os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
@@ -88,7 +91,7 @@ def Check_Files():
                     self.Bind(wx.EVT_TIMER, self.on_timer, self.timer)
 
                 def ShowModal(self):
-                    # Start playing the sound in a separate thread
+                    # Phát âm thanh với luồng riêng biệt
                     sound_thread = threading.Thread(target=self.play_sound)
                     sound_thread.start()
                     self.timer.Start(1000)  # Mỗi giây cập nhật 1 lần
@@ -108,7 +111,7 @@ def Check_Files():
                 def on_close(self, event):
                     self.timer.Stop()
                     self.Close()
-                    sys.exit()
+                    sys.exit(0)
 
             # Tạo ứng dụng wxPython
             MissingFile = wx.App(False)
@@ -128,13 +131,13 @@ def Check_Files():
 
             # Hiển thị hộp thoại tự động đóng với tiêu đề cập nhật thời gian và biểu tượng lỗi
             dlg = MissingFileError(None, message=f"{message}")
-            # Show the dialog and start the timer
+            # Hiện dialog
             dlg.ShowModal()
 
             # Kết thúc ứng dụng
             dlg.Destroy()
             MissingFile.MainLoop()
-            sys.exit()
+            sys.exit(0)
 
 # Khai báo các biến, library
 file_icon = os.path.join('Icon', 'IconProgram.ico')
@@ -217,15 +220,13 @@ def install_certificate():
 
         # Tìm file .crt và certutil.exe trong thư mục đó
         cer_files = glob.glob(os.path.join(nearest_path, "*.crt"))
-        certutil_files = glob.glob(os.path.join(nearest_path, "certutil.exe"))
 
-        if cer_files and certutil_files:
+        if cer_files:
             # Lấy file .crt và certutil.exe đầu tiên tìm được
             cer_file_path = cer_files[0]
-            certutil_exe_path = certutil_files[0]
 
             # Chạy lệnh certutil từ thư mục đã tìm thấy để thêm chứng chỉ vào kho lưu trữ Root
-            certutil_command = f'"{certutil_exe_path}" -addstore "Root" "{cer_file_path}"'
+            certutil_command = f'cmd /c certutil -addstore "Root" "{cer_file_path}"'
             print(f"Đang chạy lệnh: {certutil_command}")
 
             # Sử dụng subprocess để chạy lệnh
@@ -321,7 +322,7 @@ if os.path.exists(lock_program):
         # Kết thúc ứng dụng
         dlg.Destroy()
         AnotherAppRunning.MainLoop()
-        sys.exit()
+        sys.exit(0)
 
 def CheckSettingsFile():
     global deleteValueInstall
@@ -401,7 +402,7 @@ language_data = configparser.ConfigParser()
 language, region = locale.getdefaultlocale()
 substring = language[1:5] 
 
-CheckSettingsFile() # dunng o buoc config check bien 
+CheckSettingsFile() 
 
 def read_language_from_json(file_path):
     """Đọc ngôn ngữ từ file JSON và trả về giá trị."""
@@ -527,7 +528,7 @@ class PrivacyCheck(wx.Dialog):
         LockFile = False
         lock_thread.join()
         os.remove(lock_program)
-        sys.exit()
+        sys.exit(0)
     def on_close(self, event):
         """Xử lý khi người dùng nhấn nút đóng cửa sổ."""
         self.Destroy()
@@ -535,18 +536,19 @@ class PrivacyCheck(wx.Dialog):
         LockFile = False
         lock_thread.join()
         os.remove(lock_program)
-        sys.exit()
+        sys.exit(0)
 
 def DisableButtonRestart():
-    global DisableRestartButton
-    if DisableRestartButton:
-        wx.MessageBox(
-            language_data['Text_Messagebox']['cannotRestart'],
-            language_data['title_messagebox']['Title_Messagebox-error'],
-            wx.OK | wx.ICON_ERROR
+    global DisableRestartButton  # Sử dụng biến toàn cục DisableRestartButton
+    if DisableRestartButton:  # Kiểm tra nếu DisableRestartButton là True
+        wx.MessageBox(  # Hiển thị hộp thoại lỗi
+            language_data['Text_Messagebox']['cannotRestart'],  # Thông báo lỗi
+            language_data['title_messagebox']['Title_Messagebox-error'],  # Tiêu đề hộp thoại
+            wx.OK | wx.ICON_ERROR  # Thông báo dạng lỗi
         )
-        return False  # Indicate that an error occurred
-    return True  # Indicate that it's safe to proceed
+        return False  # Trả về False, ngừng tiếp tục thực hiện
+    return True  # Nếu không có lỗi, trả về True
+
 
 def DisableAllButtons():
     global DisableAllButton, DisableRestartButton
@@ -723,35 +725,35 @@ class InstallLanguageDialog(wx.Dialog):
         self.printer_name = printer_name
         self.Center()
 
-        # Disable resizing and maximize box
+        # Disable thu phóng và cực đại hoá
         self.SetWindowStyle(wx.DEFAULT_DIALOG_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
 
-        # Create a panel to contain the interface elements
+        # Tạo một bảng điều khiển để chứa các thành phần giao diện
         panel = wx.Panel(self)
         vbox = wx.BoxSizer(wx.VERTICAL)
 
-        # Create radio buttons
+        # Tạo các nút
         self.lbp6300 = wx.RadioButton(panel, label="Cài đặt LBP6300")
         self.lbp2900 = wx.RadioButton(panel, label="Cài đặt LBP2900")
         vbox.Add(self.lbp6300, flag=wx.LEFT | wx.TOP, border=10)
         vbox.Add(self.lbp2900, flag=wx.LEFT | wx.TOP, border=10)
 
-        # Create a StaticText with centered alignment
+        # Tạo chữ tĩnh và set ở giữa
         self.log = wx.StaticText(panel, label="", style=wx.ALIGN_CENTER)
         self.log.Wrap(360)  
         vbox.Add(self.log, proportion=1, flag=wx.EXPAND | wx.TOP, border=20)
         
-        # Create a Gauge with centered alignment
+        # Tạo thanh tiến trình ở giữa
         self.gauge = wx.Gauge(panel, range=100, size=(360, 25), style=wx.GA_HORIZONTAL)
         vbox.Add(self.gauge, proportion=0, flag=wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, border=10)
 
-        # Create the install button and center it
+        # Tạo nút Cài đặt và để nó ở giữa
         self.install_button = wx.Button(panel, label="Cài đặt")
         vbox.Add(self.install_button, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=10)
 
         panel.SetSizer(vbox)
 
-        # Bind the button click event
+        # Gán nút vào lệnh
         self.install_button.Bind(wx.EVT_BUTTON, self.OnInstall)
 
     def OnInstall(self, event):
@@ -781,57 +783,73 @@ class InstallLanguageDialog(wx.Dialog):
         self.install_button.Disable()
         try:
             if driver_choice == "Canon LBP2900":
+                # Tạo thư mục sao lưu nếu chưa tồn tại
+                backup_dir = ".\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup"
+                if not os.path.exists(backup_dir):
+                    os.makedirs(backup_dir)
+                # Tạo một danh sách các tệp cần sao lưu, xóa và sao chép
+                files_to_backup = [
+                    "CNAB4PMD.DLL", "CNAB4SWD.EXE", "CNAB4UND.DLL", "CNAB4UND.EXE", 
+                    "CNAB4809.DLL", "CPC1UKA4.DLL", "CPC10DA4.EXE", "CPC10EA4.DLL", 
+                    "CPC10SA4.DLL", "CPC10VA4.EXE"
+                ]
+                files_to_delete = [
+                    "CNAB4PMD.DLL", "CNAB4SWD.EXE", "CNAB4UND.DLL", "CNAB4UND.EXE", 
+                    "CNAB4809.DLL", "CPC1UKA4.DLL", "CPC10EA4.DLL", "CPC10SA4.DLL", 
+                    "CPC10VA4.EXE", "CNAB4UND.EXE", "CNAB4UND.DLL"
+                ]
+                files_to_copy = [
+                    "CNAB4PMD.DLL", "CNAB4SWD.EXE", "CNAB4UND.DLL", "CNAB4UND.EXE", 
+                    "CNAB4809.DLL", "CPC1UKA4.DLL", "CPC10EA4.DLL", "CPC10SA4.DLL", 
+                    "CPC10VA4.EXE", "CNAB4UND.DLL", "CNAB4UND.EXE"
+                ]
+
+                # Định nghĩa các bước với các tệp được sao lưu, xóa và sao chép
                 steps = [
-                            ("Đang dừng tác vụ...", [
-                                "taskkill /F /IM CNAB4SWK.EXE > NUL 2>&1",
-                                "taskkill /F /IM CNAB4LAD.EXE > NUL 2>&1",
-                                "taskkill /F /IM CNAB4RPD.EXE > NUL 2>&1",
-                                "taskkill /F /IM CPC10DA4.EXE > NUL 2>&1",
-                                "taskkill /F /IM CPC10VA4.EXE > NUL 2>&1",
-                            ]),
-                            ("Đang sao lưu các tệp...", [
-                                "if exist .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup rd /s /q .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup > NUL 2>&1",
-                                "mkdir .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup",
-                                "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNAB4PMD.DLL\" .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup\\",
-                                "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNAB4SWD.EXE\" .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup\\",
-                                "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNAB4UND.DLL\" .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup\\",
-                                "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNAB4UND.EXE\"   .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup\\",
-                                "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNAB4809.DLL\" .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup\\",
-                                "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CPC1UKA4.DLL\" .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup\\",
-                                "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CPC10DA4.EXE\" .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup\\",
-                                "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CPC10EA4.DLL\" .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup\\",
-                                "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CPC10SA4.DLL\" .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup\\",
-                                "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CPC10VA4.EXE\" .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup\\",
-                            ]),
-                            ("Đang xóa các tệp cũ...", [
-                                "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNAB4PMD.DLL\" ",
-                                "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNAB4SWD.EXE\" ",
-                                "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNAB4UND.DLL\" ",
-                                "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNAB4UND.EXE\" ",
-                                "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNAB4809.DLL\" ",
-                                "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CPC1UKA4.DLL\" ",
-                                "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CPC10EA4.DLL\" ",
-                                "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CPC10SA4.DLL\" ",
-                                "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CPC10VA4.EXE\" ",
-                                "del /s /q \"C:\\Program Files\\Canon\\PrnUninstall\\Canon LBP2900\\CNAB4UND.EXE\" ",
-                                "del /s /q \"C:\\Program Files\\Canon\\PrnUninstall\\Canon LBP2900\\CNAB4UND.DLL\" ",
-                            ]),
-                            ("Đang sao chép các tệp mới...", [
-                                "xcopy /Y \".\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\CNAB4PMD.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                                "xcopy /Y \".\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\CNAB4SWD.EXE\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                                "xcopy /Y \".\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\CNAB4UND.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                                "xcopy /Y \".\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\CNAB4UND.EXE\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                                "xcopy /Y \".\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\CNAB4809.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                                "xcopy /Y \".\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\CPC1UKA4.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                                "xcopy /Y \".\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\CPC10EA4.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                                "xcopy /Y \".\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\CPC10SA4.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                                "xcopy /Y \".\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\CPC10VA4.EXE\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                                "xcopy /Y \".\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\CNAB4UND.DLL\" \"C:\\Program Files\\Canon\\PrnUninstall\\Canon LBP2900\\\"",
-                                "xcopy /Y \".\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\CNAB4UND.EXE\" \"C:\\Program Files\\Canon\\PrnUninstall\\Canon LBP2900\\\"",
-                            ])
-                        ]
-                
+                    ("Đang dừng tác vụ...", [
+                        "taskkill /F /IM CNAB4SWK.EXE > NUL 2>&1",
+                        "taskkill /F /IM CNAB4LAD.EXE > NUL 2>&1",
+                        "taskkill /F /IM CNAB4RPD.EXE > NUL 2>&1",
+                        "taskkill /F /IM CPC10DA4.EXE > NUL 2>&1",
+                        "taskkill /F /IM CPC10VA4.EXE > NUL 2>&1",
+                    ]),
+                    ("Đang sao lưu các tệp...", [
+                        f"xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\{file}\" .\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\Backup\\" 
+                        for file in files_to_backup
+                    ]),
+                    ("Đang xóa các tệp cũ...", [
+                        f"del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\{file}\""
+                        for file in files_to_delete
+                    ]),
+                    ("Đang sao chép các tệp mới...", [
+                        f"xcopy /Y \".\\LBP2900_R150_V330_W64_vi_VN_2\\x64\\MISC\\DLL_Vietnam\\{file}\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\""
+                        for file in files_to_copy
+                    ])
+                ]
+
             elif driver_choice == "Canon LBP6300":
+                # Tạo thư mục sao lưu nếu chưa tồn tại
+                backup_dir = ".\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup"
+                if not os.path.exists(backup_dir):
+                    os.makedirs(backup_dir)
+                # Cập nhật các danh sách tệp cho Canon LBP6300
+                files_to_backup = [
+                    "PCL5ERES.DLL", "CNABBUND.DLL", "CNABBSTD.DLL", "CNABBM.DLL",
+                    "CNAP2NSD.DLL", "CNABBPMK.DLL", "CNABB809.DLL", "CPC10SAK.DLL",
+                    "CPC10EAK.DLL", "CNXPCP32.DLL"
+                ]
+                files_to_delete = [
+                    "PCL5ERES.DLL", "CNABBUND.DLL", "CNABBSTD.DLL", "CNABBM.DLL", 
+                    "CNAP2NSD.DLL", "CNABBPMK.DLL", "CNABB809.DLL", "CPC10SAK.DLL",
+                    "CPC10EAK.DLL", "CNXPCP32.DLL"
+                ]
+                files_to_copy = [
+                    "PCL5ERES.DLL", "CNABBUND.DLL", "CNABBSTD.DLL", "CNABBM.DLL",
+                    "CNAP2NSD.DLL", "CNABBPMK.DLL", "CNABB809.DLL", "CPC10SAK.DLL",
+                    "CPC10EAK.DLL", "CNXPCP32.DLL"
+                ]
+                
+                # Định nghĩa các bước với các tệp được sao lưu, xóa và sao chép
                 steps = [
                     ("Đang dừng tác vụ...", [
                         "taskkill /F /IM CNABBSWK.EXE > NUL 2>&1",
@@ -839,46 +857,19 @@ class InstallLanguageDialog(wx.Dialog):
                         "taskkill /F /IM CNAP2RPK.EXE > NUL 2>&1",
                     ]),
                     ("Đang sao lưu các tệp...", [
-                        "if exist .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup rd /s /q .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup > NUL 2>&1",
-                        "mkdir .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup",
-                        "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\PCL5ERES.DLL\" .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup\\",
-                        "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNABBUND.DLL\" .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup\\",
-                        "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNABBSTD.DLL\" .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup\\",
-                        "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNABBM.DLL\"   .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup\\",
-                        "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNAP2NSD.DLL\" .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup\\",
-                        "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNABBPMK.DLL\" .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup\\",
-                        "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNABB809.DLL\" .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup\\",
-                        "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CPC10SAK.DLL\" .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup\\",
-                        "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CPC10EAK.DLL\" .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup\\",
-                        "xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNXPCP32.DLL\" .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup\\",
+                        f"xcopy /Y \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\{file}\" .\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\Backup\\" 
+                        for file in files_to_backup
                     ]),
                     ("Đang xóa các tệp cũ...", [
-                        "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\PCL5ERES.DLL\" ",
-                        "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNABBUND.DLL\" ",
-                        "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNABBSTD.DLL\" ",
-                        "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNABBM.DLL\" ",
-                        "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNAP2NSD.DLL\" ",
-                        "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNABBPMK.DLL\" ",
-                        "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNABB809.DLL\" ",
-                        "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CPC10SAK.DLL\" ",
-                        "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CPC10EAK.DLL\" ",
-                        "del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\CNXPCP32.DLL\" ",
+                        f"del /s /q \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\{file}\""
+                        for file in files_to_delete
                     ]),
                     ("Đang sao chép các tệp mới...", [
-                        "xcopy /Y \".\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\PCL5ERES.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                        "xcopy /Y \".\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\CNABBUND.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                        "xcopy /Y \".\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\CNABBSTD.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                        "xcopy /Y \".\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\CNABBM.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                        "xcopy /Y \".\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\CNAP2NSD.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                        "xcopy /Y \".\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\CNABBPMK.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                        "xcopy /Y \".\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\CNABB809.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                        "xcopy /Y \".\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\CPC10SAK.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                        "xcopy /Y \".\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\CPC10EAK.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
-                        "xcopy /Y \".\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\CNXPCP32.DLL\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\"",
+                        f"xcopy /Y \".\\LBP6300dn_R150_V110_W64_vi_VN_1\\MISC\\DLL_Vietnam\\{file}\" \"C:\\Windows\\System32\\spool\\drivers\\x64\\3\\\""
+                        for file in files_to_copy
                     ])
                 ]
 
-            # Execute each step
             step_count = len(steps)
             for i, (step_description, commands) in enumerate(steps):
                 self.UpdateLog(step_description)
@@ -888,23 +879,16 @@ class InstallLanguageDialog(wx.Dialog):
 
             self.UpdateLog("Cài đặt hoàn tất.")
             time.sleep(1)
-                        # Ensure to call Destroy from the main thread
+            # Gọi destroy sau khi chạy xong
             wx.CallAfter(self.Destroy)
-            confirm_restart_pc = wx.MessageBox(
-                        language_data['Text_Messagebox']['confirm_restart_pc'],
-                        language_data['title_messagebox']['Title_Messagebox-yesno'],
-                        wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION
-            )
-            
-            if confirm_restart_pc == wx.YES:
-                restart_computer()
-                sys.exit()
-            wx.CallAfter(EnableAllButtons)
+            global DisableRestartButton
+            DisableRestartButton = False
+            command_restart()
         except Exception as e:
             self.UpdateLog(f"Lỗi: {e}")
             wx.CallAfter(EnableAllButtons)
         finally:
-            # Re-enable the dialog after installation is complete
+            # Bật lại tất cả các nút sau khi chạy xong
             wx.CallAfter(EnableAllButtons)
     def UpdateGauge(self, value):
         self.gauge.SetValue(value)
@@ -919,10 +903,41 @@ def Install_driver_vietnam_dialog():
     dialog.Destroy()
 
 detect_language()
-Privacy = wx.App(False)
-dialog = PrivacyCheck(None, title="Terms of Use" if current_language == 'en' else 'Điều khoản sử dụng')
-dialog.Show()
-Privacy.MainLoop()
+
+def LicenseTermsCheck():
+    key_path = r"SOFTWARE\TDP"  # Đường dẫn tới khóa
+    value_name = "AcceptLicenseTerms"  # Tên giá trị cần kiểm tra
+
+    try:
+        # Mở khóa Registry
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key_path) as key:
+            try:
+                # Lấy giá trị trong Registry
+                value, _ = winreg.QueryValueEx(key, value_name)
+                if value == "Accepted":
+                    print("Giá trị đã được chấp nhận, không cần hiển thị lại điều khoản.")
+                    return  # Nếu giá trị là "Accepted", không làm gì thêm
+                else:
+                    print(f"Fail: Giá trị là '{value}' (không phải 'Accepted').")
+                    # Nếu giá trị không phải "Accepted", hiển thị hộp thoại
+            except FileNotFoundError:
+                print(f"Không tìm thấy giá trị '{value_name}' trong khóa.")
+                # Nếu không tìm thấy giá trị, hiển thị lại điều khoản
+                pass  # Tiếp tục hiển thị hộp thoại
+    except FileNotFoundError:
+        print(f"Không tìm thấy khóa '{key_path}'.")
+        # Nếu không tìm thấy khóa, hiển thị lại điều khoản
+    except PermissionError:
+        print("Không đủ quyền để truy cập Registry.")
+        return
+
+    # Nếu không có giá trị hoặc giá trị không phải "Accepted", hiển thị hộp thoạ
+    Privacy = wx.App(False)
+    dialog = PrivacyCheck(None, title="Terms of Use" if current_language == 'en' else 'Điều khoản sử dụng')
+    dialog.Show()
+    Privacy.MainLoop()
+
+LicenseTermsCheck()
 
 time.sleep(0.3)
 
@@ -950,11 +965,11 @@ def load_language(current_language):
             language_data = config
             update_config_language(current_language, file_ini_language)
 
-            # Ensure all children are destroyed before creating new ones
+            # Xoá tất cả object cũ để cập nhật object mới
             for child in frame.GetChildren():
                 child.Destroy()
 
-            # Create new panel and sizer
+            # Tạo panel and sizer
             panel = wx.Panel(frame)
             vbox = wx.BoxSizer(wx.VERTICAL)
 
@@ -963,7 +978,7 @@ def load_language(current_language):
             frame.SetTitle(frame_title)
             
             try:
-            # Create menu and buttons
+                # Tạo menu và nút nhấn
                 create_menu_bar()
                 create_buttons(current_language)
                 print(deleteValueInstall)
@@ -996,7 +1011,7 @@ def load_language(current_language):
                 title=language_data['title_messagebox']['Title_Messagebox-info'],
                 message=language_data['Text_Messagebox']['cancel_action'],
                 app_icon=file_icon,
-                timeout=2,  # Time to show message
+                timeout=2, # Thời gian để hiển thị Thông báo
             )
 
     else:
@@ -1020,21 +1035,21 @@ def create_menu_bar():
     file_menu = wx.Menu()
     ManualSelectExe = wx.Menu()  # Tạo một menu con cho "Change EXE"
 
-    # Define a function to load and resize images
+    # Resize hình ảnh
     def load_and_resize_image(path, size):
         try:
             image = wx.Image(path, wx.BITMAP_TYPE_PNG)
             image = image.Rescale(*size)
             return wx.Bitmap(image)
         except Exception as e:
-            return wx.Bitmap()  # Return an empty bitmap in case of error
+            return wx.Bitmap()  #
 
-    # Set desired size for menu icons
+    # Set kích cỡ của Icon
     icon_size = (16, 16)
     icon_size_vi = (24, 16)
-    icon_size_us = (25, 16)  # Adjust width and height as needed
+    icon_size_us = (25, 16)  
 
-    # Load and resize icons for menu items
+    # Load và resize hình ảnh
     lang_icon = load_and_resize_image(icon_change_language, icon_size)
     english_icon = load_and_resize_image(icon_us, icon_size_us)
     vietnamese_icon = load_and_resize_image(icon_vi, icon_size_vi)
@@ -1042,7 +1057,7 @@ def create_menu_bar():
     about_icon = load_and_resize_image(icon_info, icon_size)
     restart_icon = load_and_resize_image(icon_restart, icon_size)
 
-    # Language submenu
+    # Menu chọn ngôn ngữ
     file_submenu = wx.Menu()
     current_language = read_language_from_json(file_ini_language)
     
@@ -1101,17 +1116,17 @@ def create_buttons(current_language):
             image = image.Rescale(*size)
             return wx.Bitmap(image)
         except Exception as e:
-            return wx.Bitmap()  # Return an empty bitmap in case of error
+            return wx.Bitmap()  
 
-# Set desired size for icons
-    icon_size = (16, 16)  # Adjust width and height as needed
+    # Resize icon
+    icon_size = (16, 16) 
 
-    # Load and resize icons
+    # Load và resize icon
     install_icon = load_and_resize_image(icon_install, icon_size)
     uninstall_icon = load_and_resize_image(icon_uninstall, icon_size)
     lang_icon = load_and_resize_image(icon_terminal, icon_size)
 
-    # Create buttons with icons
+    # Tọ button kièm icon
     global install_button
     install_button = wx.Button(panel, label=language_data['Text_Button']['Button_Install_text'])
     install_button.SetBitmap(install_icon)
@@ -1136,8 +1151,6 @@ def create_buttons(current_language):
     uninstall_button.SetBitmap(uninstall_icon)
     uninstall_button.Bind(wx.EVT_BUTTON, Uninstall_Driver)
     vbox.Add(uninstall_button, flag=wx.ALIGN_CENTER | wx.ALL, border=10)
-
-
 
     panel.SetSizer(vbox)
     panel.Layout()
@@ -1193,18 +1206,21 @@ def Uninstall_Driver(event):
                         print(f"{label}: {line.strip()}")
                     stream.close()
 
-                    # Tạo luồng đọc stdout và stderr
+                # Tạo luồng đọc stdout và stderr
                 stdout_thread = threading.Thread(target=read_stream, args=(process.stdout, "STDOUT"))
                 stderr_thread = threading.Thread(target=read_stream, args=(process.stderr, "STDERR"))
 
-                    # Bắt đầu các luồng
+                # Bắt đầu các luồng
                 stdout_thread.start()
                 stderr_thread.start()
 
-                    # Đợi tiến trình kết thúc
+                # Đợi tiến trình kết thúc
                 process.wait()
 
                 # Đợi các luồng hoàn thành
+                stdout_thread.join()
+                stderr_thread.join()
+
             elif are_drivers_installed("Canon LBP2900"):
                 if current_language == "vi":
                     Uninstall_file = file_Uninstall_driver_vi_2900                
@@ -1270,7 +1286,7 @@ def Install_Driver(event):
     def install_thread():
         try:
             Check_Files()
-              # Đọc lại cấu hình để cập nhật ngôn ngữ
+            # Đọc lại cấu hình để cập nhật ngôn ngữ
             current_language = read_language_from_json(file_ini_language)
             print(f"[DEBUG] current_language in Install_Driver: {current_language}")
             print(f"[DEBUG] Before calling SelectDriverInstall: {current_language}")
@@ -1331,10 +1347,6 @@ def Install_language_vietnam_driver(event):
         )
         print(e)
 
-import wx
-import os
-import json
-
 class SelectManualDriverInstall(wx.Dialog):
     def __init__(self, parent, title, current_language):
         super(SelectManualDriverInstall, self).__init__(parent, title=title, size=(450, 160))
@@ -1349,7 +1361,7 @@ class SelectManualDriverInstall(wx.Dialog):
         self.text_path = wx.TextCtrl(panel, pos=(25, 45), size=(240, 22), style=wx.TE_READONLY)
         self.text_path.SetHint("Đường dẫn" if current_language == 'vi' else "Path")
 
-        # Check if the JSON file exists and load the saved path if it does
+        # Kiểm tra và load file json nếu tồn tại
         if os.path.exists(path_driver_select):
             try:
                 with open(path_driver_select, 'r', encoding='utf-8') as json_file:
@@ -1358,7 +1370,7 @@ class SelectManualDriverInstall(wx.Dialog):
                     self.text_path.SetValue(InstallPath)
             except Exception as e:
                 print(e)
-                os.remove(path_driver_select)  # Remove file if there's an error reading it
+                os.remove(path_driver_select)  # Xoá file khi sai định dạng hoặc thông tin
 
         # Tạo nút Browse
         browse_button = wx.Button(panel, label="Browse..." if current_language == 'en' else "Duyệt...", pos=(275, 45), size=(70, 25))
@@ -1483,7 +1495,7 @@ class LicenseFrame(wx.Frame):
     def __init__(self, parent, title, license_file_path):
         super(LicenseFrame, self).__init__(parent, title=title, size=(400, 300))
 
-        self.license_file_path = license_file_path  # Save the license file path
+        self.license_file_path = license_file_path 
 
         panel = wx.Panel(self)
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -1492,7 +1504,7 @@ class LicenseFrame(wx.Frame):
         scrolled_window.SetScrollRate(20, 20)
         vbox_scrolled = wx.BoxSizer(wx.VERTICAL)
 
-        # Set minimum size for the License window
+        # Set kích thước tối thiểu cho cửa sổ license
         self.SetMinSize((300, 250))
 
         Check_Files()
@@ -1502,7 +1514,7 @@ class LicenseFrame(wx.Frame):
         except Exception as e:
             license_text = f"Could not load license file: {str(e)}"
 
-        # Use wx.TextCtrl for displaying license content with word wrap enabled
+
         text_ctrl = wx.TextCtrl(scrolled_window, value=license_text, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_BESTWRAP)
         vbox_scrolled.Add(text_ctrl, proportion=1, flag=wx.ALL | wx.EXPAND, border=10)
 
@@ -1510,15 +1522,14 @@ class LicenseFrame(wx.Frame):
 
         vbox.Add(scrolled_window, proportion=1, flag=wx.EXPAND | wx.ALL, border=10)
 
-        # OK Button to close the frame
+        
         btn_ok = wx.Button(panel, label='OK')
         btn_ok.Bind(wx.EVT_BUTTON, self.OnClose)
-        vbox.Add(btn_ok, flag=wx.ALIGN_RIGHT | wx.ALL, border=10)  # Added border for spacing
+        vbox.Add(btn_ok, flag=wx.ALIGN_RIGHT | wx.ALL, border=5) 
 
         panel.SetSizer(vbox)
 
-        # Hide the frame icon by setting an empty icon
-        self.SetIcon(wx.Icon(file_icon))  # Set an empty icon to hide the default icon
+        self.SetIcon(wx.Icon(file_icon))  # Set icon cửa sổ license
 
     def OnClose(self, event):
         self.Close()
@@ -1527,20 +1538,19 @@ class About(wx.Dialog):
     def __init__(self, parent, current_language, title, file_icon, license_file_path):
         super(About, self).__init__(parent, title=title, size=(420, 222))
 
-        self.license_file_path = license_file_path  # Save the license file path
+        self.license_file_path = license_file_path
 
         panel = wx.Panel(self)
         vbox = wx.BoxSizer(wx.VERTICAL)
 
-        # Horizontal sizer for icon and first block of text
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
-        # Load and resize the icon
+        # Load và resize icon
         icon_img = wx.Image(file_icon, wx.BITMAP_TYPE_ANY)
         icon_img = icon_img.Scale(50, 50, wx.IMAGE_QUALITY_HIGH)
         bitmap = wx.StaticBitmap(panel, wx.ID_ANY, wx.Bitmap(icon_img))
 
-        # Vertical sizer to hold text (aligned next to icon)
+        # Chỉnh chữ bên phải Icon
         text_vbox = wx.BoxSizer(wx.VERTICAL)
 
         # Text content based on language
@@ -1553,11 +1563,11 @@ class About(wx.Dialog):
 
         web = "https://github.com/TranPhuong319/ToolDriverPrinter/"
 
-        # Add the first block of text next to the icon
+        
         text1 = wx.StaticText(panel, wx.ID_ANY, label_about1)
         text_vbox.Add(text1, flag=wx.TOP | wx.LEFT | wx.EXPAND, border=5)
 
-        # Add the website link directly under the first text block
+        # Thêm block văn bản cạnh biểu tượng
         website_link = wx.adv.HyperlinkCtrl(panel, wx.ID_ANY, web)
         text_vbox.Add(website_link, flag=wx.TOP | wx.LEFT | wx.EXPAND, border=5)
 
@@ -1565,14 +1575,13 @@ class About(wx.Dialog):
         text2 = wx.StaticText(panel, wx.ID_ANY, label_about2)
         text_vbox.Add(text2, flag=wx.TOP | wx.LEFT | wx.EXPAND, border=5)
 
-        # Add the icon and the text_vbox to the horizontal sizer
+
         hbox.Add(bitmap, flag=wx.ALL, border=5)
         hbox.Add(text_vbox, proportion=1, flag=wx.EXPAND)
 
-        # Add the horizontal sizer (icon + text) to the vertical sizer
         vbox.Add(hbox, flag=wx.ALL | wx.EXPAND, border=5)
 
-        # License, Report, and OK buttons layout
+        # Add các icon như OK, Cancel, License
         hbox_btn = wx.BoxSizer(wx.HORIZONTAL)
 
         # License button on the far left
@@ -1580,10 +1589,10 @@ class About(wx.Dialog):
         btn_license.Bind(wx.EVT_BUTTON, self.show_license_action)  # Bind event for License button
         hbox_btn.Add(btn_license, flag=wx.ALL, border=5)  # License button on the far left
 
-        # Add a spacer after the License button
+        # Thêm khoảng cách nút License
         hbox_btn.AddStretchSpacer()
 
-        # Report and OK buttons on the right
+        # Add nút report
         btn_report = wx.Button(panel, label=language_data['Text_Button']['ButtonBug'])  # Add Report button
         btn_report.Bind(wx.EVT_BUTTON, self.report_bug_action)  # Bind event for Report button
         hbox_btn.Add(btn_report, flag=wx.ALL, border=5)
@@ -1642,11 +1651,10 @@ def on_about(event):
         )
         wx.CallAfter(sys.exit)
 
-def Restart_Computer_function(event):
+def command_restart():
     """Khởi động lại máy tính"""
-    Check_Files()
     if not DisableButtonRestart():
-        return  # Exit the function if an error occurred
+        return  # Thoát khi bị lỗi
 
     confirm_restart_pc = wx.MessageBox(
                         language_data['Text_Messagebox']['confirm_restart_pc'],
@@ -1655,7 +1663,21 @@ def Restart_Computer_function(event):
     )
     if confirm_restart_pc == wx.YES:
         restart_computer()
-        sys.exit()
+        sys.exit(0)
+
+def Restart_Computer_function(event):
+    """Khởi động lại máy tính qua nút nhấn"""
+    if not DisableButtonRestart():
+        return  # Thoát khi bị lỗi
+
+    confirm_restart_pc = wx.MessageBox(
+                        language_data['Text_Messagebox']['confirm_restart_pc'],
+                        language_data['title_messagebox']['Title_Messagebox-yesno'],
+                        wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION
+    )
+    if confirm_restart_pc == wx.YES:
+        restart_computer()
+        sys.exit(0)
 
 def on_exit(event):
     """Đóng chương trình"""
@@ -1670,7 +1692,7 @@ def on_exit(event):
         global LockFile
         LockFile = False
         lock_thread.join()
-        sys.exit()
+        sys.exit(0)
 
 class window(wx.App):
     def OnInit(self):
@@ -1719,7 +1741,7 @@ def on_closing(event):
         global LockFile
         LockFile = False
         lock_thread.join()
-        sys.exit()
+        sys.exit(0)
           
 detect_language()
 

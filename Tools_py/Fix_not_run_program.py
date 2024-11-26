@@ -29,7 +29,7 @@ def delete_temp_files_and_dirs():
     # Hiển thị thông báo hoàn thành bằng ctypes
     MB_OK = 0x00000000
     MB_ICONINFORMATION = 0x00000040
-    message = "Fixed! Please run the software again.\n\nĐã sửa lỗi xong! Vui lòng chạy lại phần mềm"
+    message = "Fixed! Please re-run the software.\n\nĐã sửa lỗi xong! Vui lòng chạy lại phần mềm"
     title = "Complete"
     ctypes.windll.user32.MessageBoxW(None, message, title, MB_ICONINFORMATION | MB_OK)
 
@@ -68,15 +68,13 @@ def install_certificate():
 
         # Tìm file .crt và certutil.exe trong thư mục đó
         cer_files = glob.glob(os.path.join(nearest_path, "*.crt"))
-        certutil_files = glob.glob(os.path.join(nearest_path, "certutil.exe"))
 
-        if cer_files and certutil_files:
+        if cer_files:
             # Lấy file .crt và certutil.exe đầu tiên tìm được
             cer_file_path = cer_files[0]
-            certutil_exe_path = certutil_files[0]
 
             # Chạy lệnh certutil từ thư mục đã tìm thấy để thêm chứng chỉ vào kho lưu trữ Root
-            certutil_command = f'"{certutil_exe_path}" -addstore "Root" "{cer_file_path}"'
+            certutil_command = f'cmd /c certutil -addstore "Root" "{cer_file_path}"'
             print(f"Đang chạy lệnh: {certutil_command}")
 
             # Sử dụng subprocess để chạy lệnh
