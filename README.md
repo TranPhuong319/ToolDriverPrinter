@@ -86,7 +86,7 @@ Nếu bạn gặp lỗi, đóng góp tính năng, vui lòng mở mục issue tr�
 - Khi bạn gặp lỗi không mở được, chương trình báo như ảnh thì xem các bước sau để sửa lỗi:
     ![image](https://github.com/user-attachments/assets/c488334c-66b1-474b-a372-e043597534ff)
 1. Kiểm tra xem có chương trình tương tự cùng chạy không
-2. Nếu không có chương trình nào chạy mà chương trình báo lỗi, chạy tệp `Fix_not_runprogram.exe` ở thư mục `Tools`
+2. Nếu không có chương trình nào chạy mà chương trình báo lỗi, chạy tệp `Fix_not_run_program.exe` ở thư mục `Tools`
 
      ![image](https://github.com/user-attachments/assets/05d1b01e-6fac-4ace-b05a-43ee58c9517f)
    
@@ -94,7 +94,7 @@ Nếu bạn gặp lỗi, đóng góp tính năng, vui lòng mở mục issue tr�
 
 ## Giấy Phép
 
-Dự án này được cấp phép theo [Apache-2.0 license](License\LICENSE-vi).
+Dự án này được cấp phép theo [Apache-2.0 license](License/LICENSE-vi).
 
 ## Ghi chú
 
@@ -183,7 +183,7 @@ If you encounter any bugs or contribute any features, please open an issue on Gi
 - When you encounter an error that cannot be opened, the program reports as shown in the image, see the following steps to fix the error:
 ![image](https://github.com/user-attachments/assets/c488334c-66b1-474b-a372-e043597534ff)
 1. Check if there is a similar program running
-2. If there is no program running and the program reports an error, run the file `Fix_not_runprogram.exe` in the `Tools` folder
+2. If there is no program running and the program reports an error, run the file `Fix_not_run_program.exe` in the `Tools` folder
    
     ![image](https://github.com/user-attachments/assets/05d1b01e-6fac-4ace-b05a-43ee58c9517f)
    
@@ -193,7 +193,7 @@ If you encounter any bugs or contribute any features, please open an issue on Gi
 
 ## License
 
-This project is licensed under the [Apache-2.0 license](License\LICENSE-en).
+This project is licensed under the [Apache-2.0 license](License/LICENSE-en).
 
 ## Notes
 
