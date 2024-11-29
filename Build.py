@@ -7,6 +7,86 @@ import getpass
 
 while True:
     try:
+        def check_python_version():
+            if sys.version_info < (3, 8, 6):
+                print(f"Error: Current Python version is {sys.version}. Minimum required version is 3.8.6.")
+                return False
+            else:
+                print(f"Current Python version is {sys.version}. Minimum required version is satisfied.")
+                return True
+
+        # Kiểm tra xem Python có được cài đặt hay không
+        def check_python_installed():
+            try:
+                subprocess.check_call(["python", "--version"])
+                return True
+            except FileNotFoundError:
+                return False
+
+        # Hàm cài đặt Python
+        def install_python():
+            response = input("Python is not installed or the version is incorrect. Would you like to install Python 3.8.6? (y/n): ").strip().lower()
+            while response not in ['y', 'n']:
+                print("Invalid input. Please re-enter.")
+                response = input("Python is not installed or the version is incorrect. Would you like to install Python 3.8.6? (y/n): ").strip().lower()
+
+            if response == 'y':
+                # Tải xuống và cài đặt Python 3.8.6
+                print("Downloading Python 3.8.6...")
+                download_url = "https://www.python.org/ftp/python/3.8.6/python-3.8.6-amd64.exe"
+                installer_path = os.path.join(os.getenv("TEMP"), "python-3.8.6.exe")
+
+                # Tải Python 3.8.6
+                subprocess.run(["curl", "-L", download_url, "-o", installer_path], check=True)
+
+                print("Installing Python 3.8.6...")
+
+                while True:
+                    try:
+                        # Cài đặt Python với quyền quản trị (UAC)
+                        subprocess.run([installer_path, "/quiet", "InstallAllUsers=1", "PrependPath=1"], check=True)
+                        print("Install was Successful!")
+                        subprocess.run(["python", "-m", "pip", "install", "--upgrade", 
+                        "wxpython", "psutil", "nuitka", "win10toast", "plyer", "pillow"])
+                        main()
+                    except subprocess.CalledProcessError as e:
+                        print(e)
+                        if e.returncode == 1602:
+                            print("An error occurred during installation.")
+                            response = input("Do you want to reinstall? (y/n): ").strip().lower()
+                            while response not in ['y', 'n']:
+                                print("Invalid input. Please re-enter.")
+                                response = input("Do you want to reinstall? (y/n): ").strip().lower()
+                            
+                            if response == 'y':
+                                print("Installing Python 3.8.6...")
+                                try:
+                                    # Khởi chạy lại tệp cài đặt với quyền quản trị (UAC)
+                                    subprocess.run([installer_path, "/quiet", "InstallAllUsers=1", "PrependPath=1"], check=True)
+                                    print("Install was Successful")
+                                    subprocess.run(["python", "-m", "pip", "install", "--upgrade", 
+                                    "wxpython", "psutil", "nuitka", "win10toast", "plyer", "pillow"])
+                                    main()
+                                    
+                                except subprocess.CalledProcessError as inner_e:
+                                    print("An error occurred during installation.")
+                                    retry_response = input("Do you want to reinstall? (y/n): ").strip().lower()
+                                    while retry_response not in ['y', 'n']:
+                                        print("Invalid input. Please re-enter.")
+                                        retry_response = input("Do you want to reinstall? (y/n): ").strip().lower()
+
+                                    if retry_response == 'n':
+                                        print("Installation was cancelled!")
+                                        sys.exit(1)
+                            elif response == 'n':
+                                print("Installation was cancelled!")
+                                sys.exit(1)
+            elif response == "n":
+                print("Installation was cancelled!")
+                sys.exit(1)
+            else:
+                time.sleep(2)
+
         def signAllFiles(namefile, pathpfx, password, algorithmSign, timestamp):
             if not timestamp == "":
                 signtoolcmd = f"signtool sign /f {pathpfx} /p {password} /fd {algorithmSign} /tr {timestamp} /td {algorithmSign} /v {namefile}"
@@ -14,7 +94,7 @@ while True:
                 signtoolcmd = f"signtool sign /f {pathpfx} /p {password} /fd {algorithmSign} /v {namefile}"
             subprocess.run(f"cmd /c {signtoolcmd}")
         os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
-        os.system('chcp 65001 >nul')
+        sys.stdout.reconfigure(encoding='utf-8')
         os.system("title Build project 'ToolDriverPrinter' wizard")
 
         version_goc = ""
@@ -101,9 +181,9 @@ while True:
             
             cmd = [
                 "nuitka ",
-                "ToolDriverPrinter.py ",
-                "--windows-uac-admin ",
-                r"--windows-icon-from-ico=Icon/IconProgram.ico ",
+                r"ToolDriverPrinter/ToolDriverPrinter.py ",
+                r"--windows-icon-from-ico=ToolDriverPrinter/Icon/IconProgram.ico ",
+                "--windows-uac-admin",
                 "--onefile ",
                 "--standalone ",
                 "--lto=yes ",
@@ -145,7 +225,7 @@ while True:
 
             cmd = [
                 "nuitka" ,
-                '"Tools_py\\Fix_not_run_program.py"',
+                '"ToolDriverPrinter\\Tools_py\\Fix_not_run_program.py"',
                 "--windows-uac-admin",
                 "--onefile",
                 "--standalone",
@@ -242,7 +322,7 @@ while True:
             print("=" * 66)
             print("\n>> Installing/Updating necessary libraries...\n")
             subprocess.run(["python", "-m", "pip", "install", "--upgrade", 
-                            "wxpython", "psutil", "nuitka", "win10toast", "plyer", "pillow", "getpass"])
+                            "wxpython", "psutil", "nuitka", "win10toast", "plyer", "pillow"])
             print("\nCompleted! Press Enter to return to the main menu.")
             input()
 
@@ -257,26 +337,26 @@ while True:
             sys.exit()
 
         if __name__ == "__main__":
-            
-            while True:
-                choice = main_menu()
-                if choice == "1":
-                    if runBuildAll == False:
-                        clear_screen()
+            def main():
+                if not check_python_installed() or not check_python_version():
+                    install_python()
+
+                while True:
+                    choice = main_menu()
+                    if choice == "1":
                         build_tool_driver_printer(version_goc)
-                elif choice == "2":
-                    if runBuildAll == False:
-                        clear_screen()
+                    elif choice == "2":
                         build_tools(version_goc)
-                elif choice == "3":
-                    build_all()
-                elif choice == "4":
-                    install_update_library()
-                elif choice == "X":
-                    exit_program()
-                else:
-                    print("\nInvalid choice. Please try again.")
-                    time.sleep(2)
+                    elif choice == "3":
+                        build_all()
+                    elif choice == "4":
+                        install_update_library()
+                    elif choice == "X":
+                        exit_program()
+                    else:
+                        print("\nInvalid choice. Please try again.")
+                        time.sleep(2)
+            main()
     except KeyboardInterrupt:
         print("\n")
         confirmExit = input("Do you want to exit? (Y/N): ")
