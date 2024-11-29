@@ -127,21 +127,151 @@
 
 ### **Giấy Phép**
 
-Dự án này được cấp phép theo [Apache-2.0 license](License/LICENSE-vi).
+Dự án này được cấp phép theo [Apache-2.0 license](License/LICENSE-vi)
 
 ---
 
 ### **Ghi chú**
 
-- Phiên bản hiện tại: 1.0.2 [Xem nhật ký thay đổi tại đây](ChangeLog.md).
+- Phiên bản hiện tại: 1.0.2. [Xem nhật ký thay đổi tại đây](ChangeLog.md).
 - Các tác giả chính: [TranPhuong319](https://github.com/TranPhuong319).
 - Cảm ơn cộng đồng đã đóng góp.
 
 ---
 
+### **Thư viện yêu cầu**
+
+- Python 3.8.6 [Tải Python 3.8.6 tại đây](https://www.python.org/downloads/release/python-386)
+- Thư viện: Cài đặt trong công cụ `Build.exe`
 ### **Liên hệ**
 
 Trần Phương - [Facebook](https://www.facebook.com/tranphuong2504).
 
 ---
 
+## **ToolDriverPrinter - English**
+<details>
+  <summary>Main Sections</summary>
+  <ol>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#download">Download</a></li>
+    <li><a href="#guide">Guide</a></li>
+    <li><a href="#note">Note</a></li>
+    <li><a href="#support">Support</a></li>
+    <li><a href="#troubleshooting">Troubleshooting</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#notes">Notes</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ol>
+</details>
+
+### Introduction
+
+**ToolDriverPrinter** is a tool for installing drivers for Canon LBP6300, Canon LBP2900 printers, and it can install other drivers as well.
+
+---
+
+### **Usage**
+
+1. Launch the application.
+2. Select the driver you want to install.
+
+---
+
+### **Features**
+
+- Simple driver installation.
+- Vietnamese language support for Canon LBP2900 and Canon LBP6300 printers.
+- Easy and quick uninstallation.
+
+---
+
+### **Download**
+
+- Download the software from the [latest Release page](https://github.com/TranPhuong319/ToolDriverPrinter/releases).
+
+---
+
+### **Guide**
+
+1. Open the software in the downloaded folder `ToolDriverPrinter.exe`.
+
+2. If this is your first time running it, the software will display a terms and conditions window. Please **read carefully** before using.
+
+    ![image](https://github.com/user-attachments/assets/da416a2b-e0d1-477a-977a-161a6f81452f)
+
+3. After agreeing to the terms, you will see the main interface of the software.
+
+   ![image](https://github.com/user-attachments/assets/37cf2cbb-7a6b-40df-a143-4acb1df24c8d)
+
+4. To install a driver, click the first button; the software will display two drivers.
+
+   ![image](https://github.com/user-attachments/assets/2143bdaf-930b-47a1-9b1b-716cfe12c45a)
+
+5. To change the language, click on `File` in the menu bar, hover over `Change Language`, and select the desired language.
+
+   ![image](https://github.com/user-attachments/assets/9f556ff9-d309-400b-b7a4-ad618a7c3854)
+
+   The software will ask if you want to change. Click `Yes` to confirm.
+
+    ![image](https://github.com/user-attachments/assets/0b0adab7-28c4-41bd-9a65-7ce1255e51e2)
+
+6. To uninstall, select the Uninstall option and follow the steps.
+
+    ![image](https://github.com/user-attachments/assets/de2b3862-e3b6-4e30-8281-ec244ad2b692)
+
+---
+### **Note**
+
+- All drivers and accompanying software are installed with a certificate named **TranPhuong319** to ensure integrity during publishing.
+ 
+  ![Certificate](https://github.com/user-attachments/assets/8dababc9-485f-4dcf-a247-6805ea219c68)
+---
+### **Support**
+
+- To build the software, run the file `Build.exe` in the downloaded folder.
+
+  ![Build](https://github.com/user-attachments/assets/bee8a87a-bed2-4158-9d6e-503a02182215)
+
+- Open the **issues** section on GitHub or contact [here](https://github.com/TranPhuong319/ToolDriverCanon/issues) if you encounter any errors.
+
+---
+
+### **Troubleshooting**
+
+* If the software does not open as shown in the image, follow the steps below:
+
+  ![AnotherProgramRunning](https://github.com/user-attachments/assets/838704df-dbd0-45c7-8bd9-c967f99bb439)
+
+1. Check if a similar program is running.
+2. If not, run the file `Fix_not_run_program.exe` in the `Tools` folder.
+
+   ![image](https://github.com/user-attachments/assets/9e9cc1f0-1819-47df-9be8-78a5eb5a561d)
+
+
+---
+
+### **License**
+
+This project is licensed under the [Apache-2.0 license](License/LICENSE-en).
+
+---
+
+### **Notes**
+
+- Current version: 1.0.2. [View the changelog here](ChangeLog.md).
+- Main authors: [TranPhuong319](https://github.com/TranPhuong319).
+- Thanks to the community for contributions.
+
+---
+
+### **Required Libraries**
+
+- Python 3.8.6 [Download Python 3.8.6 here](https://www.python.org/downloads/release/python-386)
+- Libraries: Install via the `Build.exe` tool.
+### **Contact**
+
+Trần Phương - [Facebook](https://www.facebook.com/tranphuong2504).
+
+---

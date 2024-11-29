@@ -140,54 +140,6 @@ def Check_Files():
             MissingFile.MainLoop()
             sys.exit(0)
 
-# Khai báo các biến, library
-file_icon = os.path.join('Icon', 'IconProgram.ico')
-file_en = os.path.join('Languages', 'en.lng')
-file_vi = os.path.join('Languages', 'vi.lng')
-file_setup_driver_vi_6300 = os.path.join('LBP6300dn_R150_V110_W64_vi_VN_1', 'SetupDriver.exe')
-file_Uninstall_driver_vi_6300 = os.path.join('LBP6300dn_R150_V110_W64_vi_VN_1', 'MISC', 'CNABBUND.exe')
-file_setup_driver_en_6300 = os.path.join('LBP6300dn_R150_V110_W64_uk_EN_1', 'SetupDriver.exe')
-file_Uninstall_driver_en_6300 = os.path.join('LBP6300dn_R150_V110_W64_uk_EN_1', 'MISC', 'CNABBUND.exe')
-file_setup_driver_vi_2900 = os.path.join('LBP2900_R150_V330_W64_vi_VN_2', 'x64', 'SetupDriver.exe')
-file_Uninstall_driver_vi_2900 = os.path.join('LBP2900_R150_V330_W64_vi_VN_2', 'x64', 'MISC', 'CNAB4UND.exe')
-file_setup_driver_en_2900 = os.path.join('LBP2900_R150_V330_W64_uk_EN_2', 'x64', 'SetupDriver.exe')
-file_Uninstall_driver_en_2900 = os.path.join('LBP2900_R150_V330_W64_uk_EN_2', 'x64', 'MISC', 'CNAB4UND.exe')
-icon_install = os.path.join('Icon', 'install.png')
-icon_change_language = os.path.join('Icon', 'change_language.png')
-icon_exit = os.path.join('Icon', 'exit.png')
-icon_terminal = os.path.join('Icon', 'terminal.png')
-icon_info = os.path.join('Icon', 'info.png')
-icon_uninstall = os.path.join('Icon', 'uninstall.png')
-icon_vi = os.path.join('Icon', 'vi.png')
-icon_us = os.path.join('Icon', 'us.png')
-icon_restart = os.path.join('Icon', 'restart.png')
-license_vi = os.path.join('License', 'LICENSE-vi')
-license_en = os.path.join('License', 'LICENSE-en')
-ProcessToCheck = None
-# Định nghĩa các biến tập tin
-file_ini_language = 'config.json'
-path_driver_select = 'settings.json'
-temp_path = os.getenv('TEMP')
-lock_program = os.path.join(temp_path, 'Program.LOCK')
-driver_names = ["Canon LBP2900", "Canon LBP6300"]
-DisableAllButton = False
-DisableRestartButton = False
-LockFile=True
-bug_url = "https://github.com/TranPhuong319/ToolDriverPrinter/issues"
-__version__ = '1.0.2.0'
-# Đường dẫn đến thư mục hiện tại
-src_base_path = os.getcwd()
-deleteValueInstall = False
-deleteValueUninstall = False
-Check_Files()
-
-# Lấy đường dẫn đến thư mục temp
-temp_folder_path = os.getenv('TEMP')
-
-nameProcessInfo = [
-    "Install",
-    "Uninstall"
-]
 
 def install_certificate():
     # Lấy đường dẫn đến thư mục tạm
@@ -243,8 +195,56 @@ def install_certificate():
         else:
             print("Không tìm thấy cả tệp chứng chỉ .crt và/hoặc certutil.exe trong thư mục gần nhất.")
 
-# Gọi hàm để cài đặt chứng chỉ
+
+# Khai báo các biến, library
+file_icon = os.path.join('Icon', 'IconProgram.ico')
+file_en = os.path.join('Languages', 'en.lng')
+file_vi = os.path.join('Languages', 'vi.lng')
+file_setup_driver_vi_6300 = os.path.join('LBP6300dn_R150_V110_W64_vi_VN_1', 'SetupDriver.exe')
+file_Uninstall_driver_vi_6300 = os.path.join('LBP6300dn_R150_V110_W64_vi_VN_1', 'MISC', 'CNABBUND.exe')
+file_setup_driver_en_6300 = os.path.join('LBP6300dn_R150_V110_W64_uk_EN_1', 'SetupDriver.exe')
+file_Uninstall_driver_en_6300 = os.path.join('LBP6300dn_R150_V110_W64_uk_EN_1', 'MISC', 'CNABBUND.exe')
+file_setup_driver_vi_2900 = os.path.join('LBP2900_R150_V330_W64_vi_VN_2', 'x64', 'SetupDriver.exe')
+file_Uninstall_driver_vi_2900 = os.path.join('LBP2900_R150_V330_W64_vi_VN_2', 'x64', 'MISC', 'CNAB4UND.exe')
+file_setup_driver_en_2900 = os.path.join('LBP2900_R150_V330_W64_uk_EN_2', 'x64', 'SetupDriver.exe')
+file_Uninstall_driver_en_2900 = os.path.join('LBP2900_R150_V330_W64_uk_EN_2', 'x64', 'MISC', 'CNAB4UND.exe')
+icon_install = os.path.join('Icon', 'install.png')
+icon_change_language = os.path.join('Icon', 'change_language.png')
+icon_exit = os.path.join('Icon', 'exit.png')
+icon_terminal = os.path.join('Icon', 'terminal.png')
+icon_info = os.path.join('Icon', 'info.png')
+icon_uninstall = os.path.join('Icon', 'uninstall.png')
+icon_vi = os.path.join('Icon', 'vi.png')
+icon_us = os.path.join('Icon', 'us.png')
+icon_restart = os.path.join('Icon', 'restart.png')
+license_vi = os.path.join('License', 'LICENSE-vi')
+license_en = os.path.join('License', 'LICENSE-en')
+ProcessToCheck = None
+# Định nghĩa các biến tập tin
+file_ini_language = 'config.json'
+path_driver_select = 'settings.json'
+temp_path = os.getenv('TEMP')
+lock_program = os.path.join(temp_path, 'Program.LOCK')
+driver_names = ["Canon LBP2900", "Canon LBP6300"]
+DisableAllButton = False
+DisableRestartButton = False
+LockFile=True
+bug_url = "https://github.com/TranPhuong319/ToolDriverPrinter/issues"
+__version__ = '1.0.2.0'
+# Đường dẫn đến thư mục hiện tại
+src_base_path = os.getcwd()
+deleteValueInstall = False
+deleteValueUninstall = False
 install_certificate()
+Check_Files()
+
+# Lấy đường dẫn đến thư mục temp
+temp_folder_path = os.getenv('TEMP')
+
+nameProcessInfo = [
+    "Install",
+    "Uninstall"
+]
 
 def WriteAceptedLicenseTerms():
     key_path = r"SOFTWARE\TDP"  # Đường dẫn khóa
@@ -366,20 +366,21 @@ def CheckSettingsFile():
         try:
             # Đọc dữ liệu từ file JSON
             with open(path_driver_select, 'r', encoding='utf-8') as file:
-                SelectDriver = json.load(file)
-                
+                SelectInstallDriver = json.load(file)
+            
+            global pathnameInstall
             # Lấy đường dẫn từ key 'InstallDriver'
-            pathnameInstall = SelectDriver.get('InstallDriver', "")
+            pathnameInstall = SelectInstallDriver.get('InstallDriver', "")
             
             # Kiểm tra nếu đường dẫn không đúng định dạng .exe thì set lại thành ""
             pattern = r'^[A-Za-z]:\\(?:[^\\\/:*?"<>|\r\n]+\\)*[^\\\/:*?"<>|\r\n]+\.(exe)$'
             if not re.match(pattern, pathnameInstall):
                 pathnameInstall = ""
-                SelectDriver['InstallDriver'] = pathnameInstall
+                SelectInstallDriver['InstallDriver'] = pathnameInstall
                 
                 # Lưu lại file JSON
                 with open(path_driver_select, 'w', encoding='utf-8') as file:
-                    json.dump(SelectDriver, file, ensure_ascii=False, indent=4)
+                    json.dump(SelectInstallDriver, file, ensure_ascii=False, indent=4)
                 deleteValueInstall = False
                 return False
 
@@ -390,11 +391,11 @@ def CheckSettingsFile():
             else:
                 # Nếu tệp không tồn tại, reset giá trị và set deleteValueInstall = False
                 pathnameInstall = ""
-                SelectDriver['InstallDriver'] = pathnameInstall
+                SelectInstallDriver['InstallDriver'] = pathnameInstall
                 
                 # Lưu lại file JSON
                 with open(path_driver_select, 'w', encoding='utf-8') as file:
-                    json.dump(SelectDriver, file, ensure_ascii=False, indent=4)
+                    json.dump(SelectInstallDriver, file, ensure_ascii=False, indent=4)
                 deleteValueInstall = False
                 return False
 
@@ -439,6 +440,12 @@ def LicenseTermsCheck():
     dialog.Show()
     Privacy.MainLoop()
      
+def CheckProcessRunning(path):
+    for proc in psutil.process_iter(['pid', 'name', 'exe']):
+        if proc.info['exe'] == path:
+            return True
+    return False
+
 # Tạo file lock mới để đánh dấu chương trình đang chạy
 def create_lock_file():
     # Tạo tệp khóa mới để đánh dấu chương trình đang chạy
@@ -633,7 +640,6 @@ def DisableButtonRestart():
         return False  # Trả về False, ngừng tiếp tục thực hiện
     return True  # Nếu không có lỗi, trả về True
 
-
 def DisableAllButtons():
     global DisableAllButton, DisableRestartButton
     DisableRestartButton = True
@@ -642,10 +648,11 @@ def DisableAllButtons():
         install_button.Disable()
         uninstall_button.Disable()
         if 'install_lang_button' in globals():
-            try:
-                install_lang_button.Disable()
-            except Exception as e:
-                print("Error: ", e)
+            if deleteValueInstall == False:
+                try:
+                    install_lang_button.Disable()
+                except Exception as e:
+                    print("Error: ", e)
     except:
         pass
 
@@ -1313,8 +1320,28 @@ def Install_Driver(event):
         finally:
             wx.CallAfter(EnableAllButtons)
 
-    threading.Thread(target=install_thread, daemon=True).start()
+    print(pathnameInstall)
+    if not pathnameInstall:
+        threading.Thread(target=install_thread, daemon=True).start()
+    else:
+        class ManualDriverInstall(threading.Thread):
+            def run(self):
+                try:
+                    DisableAllButtons()
+                    process = subprocess.Popen([pathnameInstall], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                    print("Running Process...")
+                    stdout, stderr = process.communicate()
+                    if process.returncode == 0:
+                        print(f"Process completed successfully:\n{stdout}")
+                        EnableAllButtons()
+                    else:
+                        print(f"Process failed with error:\n{stderr}")
+                except Exception as e:
+                    print(f"An error occurred: {e}")
 
+        # Khởi tạo và chạy thread
+        ManualDriverInstall(daemon=True).start()
+        
 def Install_language_vietnam_driver(event):
     """Cài đặt ngôn ngữ Việt"""
     DisableAllButtons()
@@ -1378,7 +1405,7 @@ class SelectManualDriverInstall(wx.Dialog):
             try:
                 with open(path_driver_select, 'r', encoding='utf-8') as json_file:
                     data = json.load(json_file)
-                    InstallPath = data.get('DriverSelectPath', {}).get('InstallDriver', "")
+                    InstallPath = data.get('InstallDriver', "")
                     self.text_path.SetValue(InstallPath)
             except Exception as e:
                 print(e)
@@ -1408,6 +1435,7 @@ class SelectManualDriverInstall(wx.Dialog):
                 if fileDialog.ShowModal() == wx.ID_CANCEL:
                     return  # Người dùng đã hủy, thoát ra.
 
+                global pathnameInstall
                 # Lấy đường dẫn của file được chọn
                 pathnameInstall = fileDialog.GetPath()
 
@@ -1418,12 +1446,11 @@ class SelectManualDriverInstall(wx.Dialog):
 
                 # Hiển thị đường dẫn trong ô line
                 self.text_path.SetValue(pathnameInstall)
-
+                
+                global SelectInstallDriver
                 # Cập nhật đường dẫn vào dictionary
-                SelectDriver = {
-                    'DriverSelectPath': {
-                        'InstallDriver': pathnameInstall
-                    }
+                SelectInstallDriver = {
+                    'InstallDriver': pathnameInstall  # Sử dụng str thay vì set
                 }
         except Exception as e:
             wx.MessageBox(f"Đã xảy ra lỗi khi chọn tệp: {str(e)}", "Lỗi", wx.ICON_ERROR)
@@ -1435,16 +1462,14 @@ class SelectManualDriverInstall(wx.Dialog):
             pathnameInstall = self.text_path.GetValue()
 
             # Cập nhật đường dẫn vào file JSON
-            if pathnameInstall or pathnameInstall == "":
-                SelectDriver = {
-                    'DriverSelectPath': {
-                        'InstallDriver': pathnameInstall
-                    }
+            if pathnameInstall or pathnameInstall == "": 
+                SelectInstallDriver = {
+                    'InstallDriver': pathnameInstall  # Sử dụng str thay vì set
                 }
-
+                
                 # Ghi lại file JSON sau khi cập nhật
                 with open(path_driver_select, 'w', encoding='utf-8') as json_file:
-                    json.dump(SelectDriver, json_file, ensure_ascii=False, indent=4)
+                    json.dump(SelectInstallDriver, json_file, ensure_ascii=False, indent=4)
 
                 # Khóa nút install_lang_button nếu có đường dẫn hợp lệ
                 if not pathnameInstall == "" and os.path.exists(pathnameInstall) and current_language == 'vi':
@@ -1455,7 +1480,6 @@ class SelectManualDriverInstall(wx.Dialog):
                             install_lang_button.Enable()
                     except Exception as e:
                         print(e)
-                deleteValueInstall = bool(pathnameInstall)
                 if not pathnameInstall == "":
                     wx.MessageBox(f"Đã lưu đường dẫn: {pathnameInstall}" if current_language == 'vi' else f"Saved path: {pathnameInstall}", "Thông báo" if current_language == "vi" else "Infomation", wx.ICON_INFORMATION)
                 else:
@@ -1691,12 +1715,19 @@ def on_exit(event):
     """Đóng chương trình"""
     # Kiểm tra trạng thái trước khi đóng
     CheckProcessDriver(nameProcessInfo)
-    if ProcessToCheck == "Install" or ProcessToCheck == "Uninstall":
+    def message():
         wx.MessageBox(
             language_data['Text_Messagebox']['not_close_window'],
             language_data['title_messagebox']['Title_Messagebox-warning'],
             wx.OK | wx.ICON_WARNING
         )
+    if deleteValueInstall == True:
+        if CheckProcessRunning(pathnameInstall):
+            message()
+        else:
+            CloseProgram()
+    elif ProcessToCheck == "Install" or ProcessToCheck == "Uninstall":
+        message
     else:
         CloseProgram()
 
@@ -1735,12 +1766,19 @@ def on_closing(event):
     """Đóng chương trình bằng nút X"""
     # Kiểm tra trạng thái trước khi đóng
     CheckProcessDriver(nameProcessInfo)
-    if ProcessToCheck == "Install" or ProcessToCheck == "Uninstall":
+    def message():
         wx.MessageBox(
             language_data['Text_Messagebox']['not_close_window'],
             language_data['title_messagebox']['Title_Messagebox-warning'],
             wx.OK | wx.ICON_WARNING
         )
+    if deleteValueInstall == True:
+        if CheckProcessRunning(pathnameInstall):
+            message()
+        else:
+            CloseProgram()
+    elif ProcessToCheck == "Install" or ProcessToCheck == "Uninstall":
+        message
     else:
         CloseProgram()
           
