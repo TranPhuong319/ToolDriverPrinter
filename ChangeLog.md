@@ -12,5 +12,6 @@
 - Add report bugs button.
 - Add restart button in menu bar.
 - Change how installation and uninstall progress checks are run.
+- Change the title Program
 
  

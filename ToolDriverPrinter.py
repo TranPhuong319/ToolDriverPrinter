@@ -1,13 +1,17 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
- Printer driver installation tool.
- Copyright ©️ 2023-2024 TranPhuong319.
- Version 1.0.2.
- Compile by Nuitka.
- More infomation, visit https://github.com/TranPhuong319/ToolDriverPrinter.
+    Easy Printer Driver Install/Uninstall Tool
+    Copyright ©️ 2023-2025 TranPhuong319.
+    Version 1.0.2.
+    Compile by Nuitka.
+    License: Apache License.
+    More infomation, visit https://github.com/TranPhuong319/ToolDriverPrinter.
 """
-import json ; import os ; import subprocess ; import sys ; import wx.adv; import glob; import tempfile; from datetime import datetime; import re ; import webbrowser ; import configparser
-import wx ; import msvcrt ; import locale ; import threading; import time; import winsound; from plyer import notification; import fnmatch ; import winreg ; import psutil # Nhập thư viện cần thiết
+import json ; import os ; import subprocess ; import sys ; import wx.adv ; import configparser
+import glob; import tempfile; from datetime import datetime; import re ; import webbrowser 
+import wx ; import msvcrt ; import locale ; import threading; import time; import winsound 
+from plyer import notification; import fnmatch ; import winreg ; import psutil # Nhập thư viện cần thiết
 
 # Thay đổi thư mục làm việc thành thư mục chứa tệp chạy
 os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
@@ -24,8 +28,9 @@ onefile_dirs = glob.glob(os.path.join(temp_dir, 'onefile_*'))
 # Kiểm tra xem có thư mục nào khớp với định dạng không và tìm thư mục gần nhất
 latest_onefile_dir = None
 latest_creation_time = 0
-missingfiletext = "MissingFiles.log"
+missingfiletext = "TDP-MissingFiles.log"
 ProcessRunning = ""
+pathnameInstall = ""
 
 def Check_Files():        
     """Kiểm tra xem file tồn tại không nếu không thì báo lỗi và thoát chương trình"""
@@ -221,16 +226,16 @@ license_vi = os.path.join('License', 'LICENSE-vi')
 license_en = os.path.join('License', 'LICENSE-en')
 ProcessToCheck = None
 # Định nghĩa các biến tập tin
-file_ini_language = 'config.json'
-path_driver_select = 'settings.json'
+file_ini_language = 'TDP-Config.json'
+path_driver_select = 'TDP-PathDriver.json'
 temp_path = os.getenv('TEMP')
-lock_program = os.path.join(temp_path, 'Program.LOCK')
+lock_program = os.path.join(temp_path, 'Program.LCK')
 driver_names = ["Canon LBP2900", "Canon LBP6300"]
 DisableAllButton = False
 DisableRestartButton = False
 LockFile=True
 bug_url = "https://github.com/TranPhuong319/ToolDriverPrinter/issues"
-__version__ = '1.0.2.0'
+__version__ = '1.0.2'
 # Đường dẫn đến thư mục hiện tại
 src_base_path = os.getcwd()
 deleteValueInstall = False
@@ -441,9 +446,18 @@ def LicenseTermsCheck():
     Privacy.MainLoop()
      
 def CheckProcessRunning(path):
-    for proc in psutil.process_iter(['pid', 'name', 'exe']):
-        if proc.info['exe'] == path:
-            return True
+    try:
+        for proc in psutil.process_iter(['pid', 'name', 'exe']):
+            exe_path = proc.info.get('exe')
+            name = proc.info.get('name')  # Lấy tên tiến trình
+            
+            # So khớp cả đường dẫn và tên file nếu cần
+            if exe_path and exe_path.lower() == path.lower():
+                return True
+            elif name and name.lower() == os.path.basename(path).lower():
+                return True
+    except (psutil.AccessDenied, psutil.NoSuchProcess):
+        pass
     return False
 
 # Tạo file lock mới để đánh dấu chương trình đang chạy
@@ -721,8 +735,8 @@ class ChoiceDriverInstall(wx.Dialog):
                     wx.CallAfter(EnableAllButtons)
                 except Exception as e:
                     wx.CallAfter(wx.MessageBox,
-                        f"Đã xảy ra lỗi trong quá trình cài đặt:\n{e}",
-                        "Lỗi",
+                        f"An error occurred during installation:\n{e}",
+                        "Error",
                         wx.OK | wx.ICON_ERROR
                     )
                     wx.CallAfter(EnableAllButtons)
@@ -785,8 +799,8 @@ class ChoiceDriverUninstall(wx.Dialog):
                     wx.CallAfter(EnableAllButtons)
                 except Exception as e:
                     wx.CallAfter(wx.MessageBox,
-                        f"Đã xảy ra lỗi:\n{e}",
-                        "Lỗi",
+                        f"An error occurred during uninstallation:\n{e}",
+                        "Error",
                         wx.OK | wx.ICON_ERROR
                     )
                     wx.CallAfter(EnableAllButtons)
@@ -1071,6 +1085,7 @@ def create_menu_bar():
     menu_bar = wx.MenuBar()
     file_menu = wx.Menu()
     ManualSelectExe = wx.Menu()  # Tạo một menu con cho "Change EXE"
+    help_menu = wx.Menu()
 
     # Resize hình ảnh
     def load_and_resize_image(path, size):
@@ -1126,8 +1141,6 @@ def create_menu_bar():
     frame.Bind(wx.EVT_MENU, on_exit, exit_item)
 
     menu_bar.Append(file_menu, language_data['Menu_Program']['menuFile'])
-
-    help_menu = wx.Menu()
 
     about_item = help_menu.Append(wx.ID_ABOUT, language_data['Menu_Program']['menuAbout'])
     about_item.SetBitmap(about_icon)
@@ -1320,28 +1333,51 @@ def Install_Driver(event):
         finally:
             wx.CallAfter(EnableAllButtons)
 
-    print(pathnameInstall)
     if not pathnameInstall:
         threading.Thread(target=install_thread, daemon=True).start()
     else:
         class ManualDriverInstall(threading.Thread):
+            def __init__(self, finishCommandInstall=None):
+                super().__init__(daemon=True)
+                self.finishCommandInstall = finishCommandInstall
+
             def run(self):
                 try:
                     DisableAllButtons()
-                    process = subprocess.Popen([pathnameInstall], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                    process = subprocess.Popen(
+                        [pathnameInstall],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        text=True
+                    )
                     print("Running Process...")
                     stdout, stderr = process.communicate()
                     if process.returncode == 0:
                         print(f"Process completed successfully:\n{stdout}")
-                        EnableAllButtons()
                     else:
                         print(f"Process failed with error:\n{stderr}")
                 except Exception as e:
                     print(f"An error occurred: {e}")
+                finally:
+                    if self.finishCommandInstall:
+                        wx.CallAfter(self.finishCommandInstall)  # Gọi callback khi hoàn tất
 
-        # Khởi tạo và chạy thread
-        ManualDriverInstall(daemon=True).start()
-        
+        def commandOnFinishInstall():
+            """Callback thực hiện sau khi thread hoàn tất."""
+            EnableAllButtons()
+
+        try:
+            DisableAllButtons()
+            # Tạo và chạy thread, truyền callback vào
+            thread = ManualDriverInstall(finishCommandInstall=commandOnFinishInstall)
+            thread.start()
+        except Exception as e:
+            wx.MessageBox(
+                f"Đã xảy ra lỗi khi cố gắng chạy chương trình: {e}" if current_language == 'vi' else f"An error occurred while trying to run the program: {e}",
+                "Lỗi" if current_language == 'vi' else "Error",
+                wx.OK | wx.ICON_ERROR
+            )
+
 def Install_language_vietnam_driver(event):
     """Cài đặt ngôn ngữ Việt"""
     DisableAllButtons()
@@ -1379,12 +1415,15 @@ def Install_language_vietnam_driver(event):
         else:
             # Nếu có nhiều driver, hiển thị hộp thoại chọn driver
             Install_driver_vietnam_dialog()
+            EnableAllButtons()
     except Exception as e:
         wx.MessageBox(
             f"{language_data['Text_Messagebox']['unknown_error']}\n{e}",
             language_data['title_messagebox']['Title_Messagebox-error'],
             wx.OK | wx.ICON_ERROR
-        )
+        )  
+    finally:
+        EnableAllButtons()
 
 class SelectManualDriverInstall(wx.Dialog):
     def __init__(self, parent, title, current_language):
@@ -1398,7 +1437,7 @@ class SelectManualDriverInstall(wx.Dialog):
 
         # Tạo đường dẫn (ô dòng đơn - single line)
         self.text_path = wx.TextCtrl(panel, pos=(25, 45), size=(240, 22), style=wx.TE_READONLY)
-        self.text_path.SetHint("Đường dẫn" if current_language == 'vi' else "Path")
+        self.text_path.SetHint(language_data['LabelGUI']['PathManualDriver'])
 
         # Kiểm tra và load file json nếu tồn tại
         if os.path.exists(path_driver_select):
@@ -1411,11 +1450,11 @@ class SelectManualDriverInstall(wx.Dialog):
                 print(e)
 
         # Tạo nút Browse
-        browse_button = wx.Button(panel, label="Browse..." if current_language == 'en' else "Duyệt...", pos=(275, 45), size=(70, 25))
+        browse_button = wx.Button(panel, label=language_data['Text_Button']['BrowseFileDriver'], pos=(270, 45), size=(70, 25))
         browse_button.Bind(wx.EVT_BUTTON, self.onBrowse)
         
         # Tạo nút Delete Value
-        delete_button = wx.Button(panel, label="Delete Value" if current_language == 'en' else "Xóa giá trị", pos=(350, 45), size=(75, 25))
+        delete_button = wx.Button(panel, label=language_data['Text_Button']['DeleteValue'], pos=(343, 45), size=(88, 25))
         delete_button.Bind(wx.EVT_BUTTON, self.Delete_value)
 
         # Tạo nút OK
@@ -1429,7 +1468,7 @@ class SelectManualDriverInstall(wx.Dialog):
         current_language = read_language_from_json(file_ini_language)
         try:
             # Tạo hộp thoại chọn file .exe
-            with wx.FileDialog(self, "Chọn tệp cài đặt" if current_language == 'vi' else "Select Install file", wildcard="Executable files (*.exe)|*.exe",
+            with wx.FileDialog(self, language_data['Title_Program']['DialogSelectManualInstall'], wildcard="Executable files (*.exe)|*.exe",
                                style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as fileDialog:
 
                 if fileDialog.ShowModal() == wx.ID_CANCEL:
@@ -1441,7 +1480,10 @@ class SelectManualDriverInstall(wx.Dialog):
 
                 # Kiểm tra nếu tệp tồn tại
                 if not os.path.exists(pathnameInstall):
-                    wx.MessageBox(f"Tệp không tồn tại: {pathnameInstall}", "Lỗi", wx.ICON_ERROR)
+                    if  current_language == 'vi':
+                        wx.MessageBox(f"Tệp không tồn tại: {pathnameInstall}", "Lỗi", wx.ICON_ERROR)
+                    else: 
+                        wx.MessageBox(f"File not found: {pathnameInstall}", "Error", wx.ICON_ERROR)
                     return
 
                 # Hiển thị đường dẫn trong ô line
@@ -1453,7 +1495,7 @@ class SelectManualDriverInstall(wx.Dialog):
                     'InstallDriver': pathnameInstall  # Sử dụng str thay vì set
                 }
         except Exception as e:
-            wx.MessageBox(f"Đã xảy ra lỗi khi chọn tệp: {str(e)}", "Lỗi", wx.ICON_ERROR)
+            wx.MessageBox(f"An error occurred while selecting a file: {str(e)}", "Lỗi", wx.ICON_ERROR)
 
     def OnOK(self, event):
         current_language = read_language_from_json(file_ini_language)
@@ -1494,12 +1536,28 @@ class SelectManualDriverInstall(wx.Dialog):
 
 def DialogSelectManualInstall(event):
     current_language = read_language_from_json(file_ini_language)
+    if DisableAllButton == True:
+        wx.MessageBox(
+            "This option cannot be selected while installing/uninstalling a driver." if current_language == 'en' else 'Không thể chọn tuỳ chọn này khi đang cài đặt / gỡ cài đặt trình điều khiển.',
+            "Error!" if current_language == 'en' else 'Lỗi!',
+            wx.OK | wx.ICON_ERROR  # Thông báo dạng lỗi
+        )
+        return
     dialog=SelectManualDriverInstall(None, title=language_data['Title_Program']['SelectManualDriver'], current_language=current_language)
     dialog.ShowModal()
     dialog.Destroy()
 
 def DialogSelectManualUninstall(event):
-    pass
+    current_language = read_language_from_json(file_ini_language)
+    if DisableAllButton == True:
+        wx.MessageBox(
+            "This option cannot be selected while installing/uninstalling a driver." if current_language == 'en' else 'Không thể chọn tuỳ chọn này khi đang cài đặt / gỡ cài đặt trình điều khiển.',
+            "Error!" if current_language == 'en' else 'Lỗi!',
+            wx.OK | wx.ICON_ERROR  # Thông báo dạng lỗi
+        )
+        return
+
+
 
 def update_config_language(new_language, config_file_path):
     """Cập nhật ngôn ngữ mới vào file JSON."""
@@ -1587,11 +1645,11 @@ class About(wx.Dialog):
 
         # Text content based on language
         if current_language == "vi":
-            label_about1 = f"Công cụ cài đặt trình điều khiển máy in Canon.\nPhiên bản v.{__version__}\nCopyright ©️ 2023-2024 TranPhuong319. All rights reserved."
-            label_about2 = "\nTrình điều khiển máy in Canon.\nCopyright ©️ 2009-2012 Canon Inc. All rights reserved."
+            label_about1 = f"Công cụ cài đặt trình điều khiển máy in Canon.\nPhiên bản v.{__version__}\nCopyright ©️ 2023-2025 TranPhuong319. Mọi quyền được bảo lưu."
+            label_about2 = "\nTrình điều khiển máy in Canon.\nCopyright ©️ 2009-2012 Canon Inc. Mọi quyền được bảo lưu."
         else:
-            label_about1 = f"Canon printer driver installation tool.\nVersion v.{__version__}\nCopyright ©️ 2023-2024 TranPhuong319. All rights reserved."
-            label_about2 = "\nCanon driver.\nCopyright ©️ 2009-2012 Canon Inc. All rights reserved."
+            label_about1 = f"Canon printer driver installation tool.\nVersion v.{__version__}\nCopyright ©️ 2023-2025 TranPhuong319. All rights reserved."
+            label_about2 = "\nCanon Driver.\nCopyright ©️ 2009-2012 Canon Inc. All rights reserved."
 
         web = "https://github.com/TranPhuong319/ToolDriverPrinter/"
 
@@ -1607,7 +1665,6 @@ class About(wx.Dialog):
         text2 = wx.StaticText(panel, wx.ID_ANY, label_about2)
         text_vbox.Add(text2, flag=wx.TOP | wx.LEFT | wx.EXPAND, border=5)
 
-
         hbox.Add(bitmap, flag=wx.ALL, border=5)
         hbox.Add(text_vbox, proportion=1, flag=wx.EXPAND)
 
@@ -1617,7 +1674,7 @@ class About(wx.Dialog):
         hbox_btn = wx.BoxSizer(wx.HORIZONTAL)
 
         # License button on the far left
-        btn_license = wx.Button(panel, label='License' if current_language == "en" else 'Giấy phép')  # Add License button
+        btn_license = wx.Button(panel, label=language_data['Text_Button']['LicenseButton'])  # Add License button
         btn_license.Bind(wx.EVT_BUTTON, self.show_license_action)  # Bind event for License button
         hbox_btn.Add(btn_license, flag=wx.ALL, border=5)  # License button on the far left
 
@@ -1647,7 +1704,7 @@ class About(wx.Dialog):
         """Hiện license dựa triên ngôn ngữ"""
         current_language = read_language_from_json(file_ini_language)
         if (os.path.exists(license_vi) and current_language == 'vi') or (os.path.exists(license_en) and current_language == 'en'):
-            license_frame = LicenseFrame(self, title="License" if current_language == 'en' else 'Giấy phép', license_file_path=self.license_file_path)
+            license_frame = LicenseFrame(self, title=language_data['Title_Program']['LicenseFrame'], license_file_path=self.license_file_path)
             license_frame.Show()
         else:
             wx.MessageBox(
@@ -1714,20 +1771,20 @@ def Restart_Computer_function(event):
 def on_exit(event):
     """Đóng chương trình"""
     # Kiểm tra trạng thái trước khi đóng
-    CheckProcessDriver(nameProcessInfo)
-    def message():
-        wx.MessageBox(
-            language_data['Text_Messagebox']['not_close_window'],
-            language_data['title_messagebox']['Title_Messagebox-warning'],
-            wx.OK | wx.ICON_WARNING
-        )
+    global pathnameInstall
+    pathnameInstall = os.path.abspath(pathnameInstall)
+    print(pathnameInstall)
+    print(CheckProcessRunning(pathnameInstall))
     if deleteValueInstall == True:
         if CheckProcessRunning(pathnameInstall):
-            message()
+            messageClosingError()
+            return
         else:
             CloseProgram()
-    elif ProcessToCheck == "Install" or ProcessToCheck == "Uninstall":
-        message
+    else:
+        CheckProcessDriver(nameProcessInfo)
+    if ProcessToCheck == "Install" or ProcessToCheck == "Uninstall":
+        messageClosingError()
     else:
         CloseProgram()
 
@@ -1751,7 +1808,7 @@ class window(wx.App):
             create_menu_bar()
         except Exception as e:
             wx.MessageBox(
-                        f"An error occurred while loading program.\n {e}\nExiting...",
+                        f"{language_data['Text_Messagebox']['CannotLoadProgram']}\n {e}\nExiting...",
                         "Error!",
                         wx.OK | wx.ICON_ERROR
             )
@@ -1761,24 +1818,31 @@ class window(wx.App):
 
         frame.Show()
         return True
-    
+
+def messageClosingError():
+            wx.MessageBox(
+                language_data['Text_Messagebox']['not_close_window'],
+                language_data['title_messagebox']['Title_Messagebox-warning'],
+                wx.OK | wx.ICON_WARNING
+            )
+
 def on_closing(event):
     """Đóng chương trình bằng nút X"""
     # Kiểm tra trạng thái trước khi đóng
-    CheckProcessDriver(nameProcessInfo)
-    def message():
-        wx.MessageBox(
-            language_data['Text_Messagebox']['not_close_window'],
-            language_data['title_messagebox']['Title_Messagebox-warning'],
-            wx.OK | wx.ICON_WARNING
-        )
+    global pathnameInstall
+    pathnameInstall = os.path.abspath(pathnameInstall)
+    print(pathnameInstall)
+    print(CheckProcessRunning(pathnameInstall))
     if deleteValueInstall == True:
         if CheckProcessRunning(pathnameInstall):
-            message()
+            messageClosingError()
+            return
         else:
             CloseProgram()
-    elif ProcessToCheck == "Install" or ProcessToCheck == "Uninstall":
-        message
+    else:
+        CheckProcessDriver(nameProcessInfo)
+    if ProcessToCheck == "Install" or ProcessToCheck == "Uninstall":
+        messageClosingError()
     else:
         CloseProgram()
           

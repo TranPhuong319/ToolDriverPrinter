@@ -1,9 +1,11 @@
 [Title_Program]
-Title=Canon printer driver installation tool
+Title=Printer driver install/uninstall tool
 Title_pupop_about=About
 Title_select_driver = Select driver
 Title_install = Launch the driver
 SelectManualDriver = Manual printer driver selector
+DialogSelectManualInstall = Select the installation file
+LicenseFrame = License
 
 [Menu_Program]
 menuFile=File
@@ -16,12 +18,11 @@ menuManualSelectFile = Select files manually
 ActionUninstallSelect = Uninstall file
 ActionInstallSelect = Install file
 
-
 [title_messagebox]
-Title_Messagebox-info=Notification!
-Title_Messagebox-warning=Warning!
-Title_Messagebox-error=Error!
-Title_Messagebox-yesno=Confirm?
+Title_Messagebox-info=Notification
+Title_Messagebox-warning=Warning
+Title_Messagebox-error=Error
+Title_Messagebox-yesno=Confirm
 
 [Text_Messagebox]
 not_install_driver=You have not installed the Canon driver!
@@ -34,6 +35,7 @@ cannot_change_language=You cannot switch the language because the required langu
 cannot_install=The installer could not be launched because the installation file could not be found!
 unknown_error=An error occurred! Please check and try again.
 cannotRestart = You cannot restart your computer while installing / uninstalling drivers!
+CannotLoadProgram = An error occurred while loading program.
 
 [Text_Dialog]
 SelectDriverInstall = Select the driver you want to install below
@@ -46,3 +48,13 @@ InfoManualSelect = Please select the driver using the [Browse...] button.
 Button_Install_text=Install printer driver...    
 Button_Uninstall_text=Uninstall printer driver...
 ButtonBug=Bug Report
+DiclineLicenseButton = Decline
+AcceptLicenseButton = Accept
+LicenseButton = License
+BrowseFileDriver = Browse...
+DeleteValue = Delete path
+
+[LabelGUI]
+confirmAcceptLicense = Do you agree to the terms of use?
+LicenseNotFound = License file not found.
+PathManualDriver = Path

@@ -197,7 +197,7 @@ while True:
                 '--product-name="Easy Printer Driver Install/Uninstall Tool" ',
                 f"--file-version={version} ",
                 f"--product-version={version} ",
-                '--copyright="Copyright © 2023-2024 TranPhuong319. All rights reserved"'
+                '--copyright="Copyright © 2023-2025 TranPhuong319. All rights reserved"'
             ]
 
             cmd = " ".join(cmd)
@@ -240,7 +240,7 @@ while True:
                 '--product-name="Fix not run Program" ',
                 f"--file-version={version}",
                 f"--product-version={version}",
-                '--copyright="Copyright © 2023-2024 TranPhuong319. All rights reserved"',
+                '--copyright="Copyright © 2023-2025 TranPhuong319. All rights reserved"',
             ]
             cmd = " ".join(cmd)
             
