@@ -6,7 +6,7 @@
     Version 1.0.2.
     Compile by Nuitka.
     License: Apache License.
-    More infomation, visit https://github.com/TranPhuong319/ToolDriverPrinter.
+    More infomation, visit https://github.com/TranPhuong319/ToolDriverPrinter.git
 """
 import json ; import os ; import subprocess ; import sys ; import wx.adv ; import configparser
 import glob; import tempfile; from datetime import datetime; import re ; import webbrowser 
